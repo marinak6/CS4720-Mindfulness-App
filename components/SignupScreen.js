@@ -1,24 +1,31 @@
 import React from 'react'
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, Button } from 'react-native'
+import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native'
 import Firebase from '../Firebase'
-
-class Login extends React.Component {
+class SignupScreen extends React.Component {
     state = {
+        name: '',
         email: '',
         password: ''
     }
 
-    handleLogin = () => {
+    handleSignUp = () => {
         const { email, password } = this.state
         Firebase.auth()
-            .signInWithEmailAndPassword(email, password)
-            .then(() => this.props.navigation.navigate('Welcome'))
+            .createUserWithEmailAndPassword(email, password)
+            .then(() => this.props.navigation.navigate('Login'))
             .catch(error => console.log(error))
     }
 
+    // Update styling
     render() {
         return (
             <View style={styles.container}>
+                <TextInput
+                    style={styles.inputBox}
+                    value={this.state.name}
+                    onChangeText={name => this.setState({ name })}
+                    placeholder='Full Name'
+                />
                 <TextInput
                     style={styles.inputBox}
                     value={this.state.email}
@@ -33,11 +40,9 @@ class Login extends React.Component {
                     placeholder='Password'
                     secureTextEntry={true}
                 />
-                <TouchableOpacity onPress={this.handleLogin} style={styles.button}>
-
-                    <Text style={styles.buttonText}>Login</Text>
+                <TouchableOpacity style={styles.button} onPress={this.handleSignUp}>
+                    <Text style={styles.buttonText}>Signup</Text>
                 </TouchableOpacity>
-                <Button title="Don't have an account yet? Sign up" onPress={() => this.props.navigation.navigate('Signup')} />
             </View>
         )
     }
@@ -63,8 +68,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingVertical: 5,
         alignItems: 'center',
-        backgroundColor: '#F6820D',
-        borderColor: '#F6820D',
+        backgroundColor: '#FFA611',
+        borderColor: '#FFA611',
         borderWidth: 1,
         borderRadius: 5,
         width: 200
@@ -78,4 +83,4 @@ const styles = StyleSheet.create({
         fontSize: 12
     }
 })
-export default Login
+export default SignupScreen

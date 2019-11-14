@@ -1,16 +1,18 @@
 import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-import Login from './components/Login'
-import Signup from './components/Signup'
-import Welcome from './components/Welcome'
+import LoginScreen from './components/LoginScreen'
+import SignupScreen from './components/SignupScreen'
+import WelcomeScreen from './components/WelcomeScreen'
+import HomeScreen from './components/HomeScreen'
 
 
 const rootStack = createStackNavigator({
-  Login: Login,
-  Signup: Signup,
-  Welcome: Welcome,
+  Login: LoginScreen,
+  Signup: SignupScreen,
+  Welcome: WelcomeScreen,
+  Home: HomeScreen,
 }, {
-    initalRouteName: 'Login'
+    initialRouteName: 'Welcome'
   }
 );
 const AppContainer = createAppContainer(rootStack)

@@ -1,12 +1,12 @@
 import React from 'react'
 import { View, Text } from 'react-native'
-class Welcome extends React.Component {
+class HomeScreen extends React.Component {
     render() {
         return (
             <View>
-                <Text>Welcome!</Text>
+                <Text>Login success!!</Text>
             </View>
         )
     }
 }
-export default Welcome
+export default HomeScreen
