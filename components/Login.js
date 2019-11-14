@@ -1,10 +1,21 @@
 import React from 'react'
 import { View, TextInput, StyleSheet, TouchableOpacity, Text, Button } from 'react-native'
+import Firebase from '../Firebase'
+
 class Login extends React.Component {
     state = {
         email: '',
         password: ''
     }
+
+    handleLogin = () => {
+        const { email, password } = this.state
+        Firebase.auth()
+            .signInWithEmailAndPassword(email, password)
+            .then(() => this.props.navigation.navigate('Welcome'))
+            .catch(error => console.log(error))
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -22,10 +33,11 @@ class Login extends React.Component {
                     placeholder='Password'
                     secureTextEntry={true}
                 />
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity onPress={this.handleLogin} style={styles.button}>
+
                     <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
-                <Button title="Don't have an account yet? Sign up" />
+                <Button title="Don't have an account yet? Sign up" onPress={() => this.props.navigation.navigate('Signup')} />
             </View>
         )
     }
