@@ -1,24 +1,19 @@
-import React from 'react';
-import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
-import WelcomeScreen from './components/WelcomeScreen';
-import LoginScreen from './components/LoginScreen';
+import { createStackNavigator } from 'react-navigation-stack';
+import LoginScreen from './components/LoginScreen'
+import SignupScreen from './components/SignupScreen'
+import WelcomeScreen from './components/WelcomeScreen'
+import HomeScreen from './components/HomeScreen'
 
 
-const AppNavigator = createStackNavigator(
-  {
-    Welcome: WelcomeScreen,
-    Login: LoginScreen,
-  },
-  {
+const rootStack = createStackNavigator({
+  Login: LoginScreen,
+  Signup: SignupScreen,
+  Welcome: WelcomeScreen,
+  Home: HomeScreen,
+}, {
     initialRouteName: 'Welcome'
   }
 );
-
-const AppContainer = createAppContainer(AppNavigator);
-
-export default class App extends React.Component {
-  render() {
-    return <AppContainer />;
-  }
-}
+const AppContainer = createAppContainer(rootStack)
+export default AppContainer;
