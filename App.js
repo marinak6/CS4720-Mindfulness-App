@@ -1,19 +1,17 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
+import Login from './components/Login'
+import Signup from './components/Signup'
+import Welcome from './components/Welcome'
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Welcome to our mindfulness app :,)</Text>
-    </View>
-  );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+const rootStack = createStackNavigator({
+  Login: Login,
+  Signup: Signup,
+  Welcome: Welcome,
+}, {
+    initalRouteName: 'Login'
+  }
+);
+const AppContainer = createAppContainer(rootStack)
+export default AppContainer;
