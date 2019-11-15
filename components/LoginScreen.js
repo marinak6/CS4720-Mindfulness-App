@@ -19,6 +19,7 @@ class LoginScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        <Text style={styles.welcomeTitle}> Mindfulness</Text>
         <TextInput
           style={styles.inputBox}
           value={this.state.email}
@@ -34,10 +35,13 @@ class LoginScreen extends React.Component {
           secureTextEntry={true}
         />
         <TouchableOpacity onPress={this.handleLogin} style={styles.button}>
-
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
-        <Button title="Don't have an account yet? Sign up" onPress={() => this.props.navigation.navigate('Signup')} />
+        <TouchableOpacity
+          onPress={() => this.props.navigation.navigate('Signup')} 
+        >
+          <Text style={styles.signUpLink}> Don't have an account yet? Sign up </Text>
+        </TouchableOpacity>
       </View>
     )
   }
@@ -48,6 +52,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  welcomeTitle: {
+    fontFamily:'BodoniSvtyTwoITCTT-Bold',
+    fontSize:50, 
+    padding: 10
+  }, 
+  signUpLink: {
+    fontFamily: 'AppleSDGothicNeo-Light',
+    fontSize: 20, 
   },
   inputBox: {
     width: '85%',
@@ -63,13 +76,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingVertical: 5,
     alignItems: 'center',
-    backgroundColor: '#F6820D',
-    borderColor: '#F6820D',
+    backgroundColor: '#CBBADE',
+    borderColor: '#CBBADE',
     borderWidth: 1,
     borderRadius: 5,
     width: 200
   },
   buttonText: {
+    fontFamily:'KohinoorBangla-Semibold',
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff'
