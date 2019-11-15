@@ -18,8 +18,7 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Home',
         tabBarIcon: ({ tintColor }) => (
-          <Ionicons name="ios-home" color={tintColor} size={25} />
-
+          <Ionicons name="ios-home" color={tintColor} size={27} />
         )
       }
     },
@@ -28,7 +27,7 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Journal',
         tabBarIcon: ({ tintColor }) => (
-          <FontAwesome name="pencil" color={tintColor} size={25} />
+          <FontAwesome name="pencil" color={tintColor} size={27} />
         )
       }
     },
@@ -37,9 +36,20 @@ const AppStack = createBottomTabNavigator(
       navigationOptions: {
         tabBarLabel: 'Calendar',
         tabBarIcon: ({ tintColor }) => (
-          <Ionicons name="ios-calendar" color={tintColor} size={25} />
+          <Ionicons name="ios-calendar" color={tintColor} size={27} />
         )
       }
+    }
+  },
+  {
+    tabBarOptions: {
+      showLabel: false,
+      activeTintColor: '#b49dcc',
+      inactiveTintColor: '#c7c7c7',
+      style: {
+        backgroundColor: 'white'
+      },
+      tabStyle: {}
     }
   }
 );
