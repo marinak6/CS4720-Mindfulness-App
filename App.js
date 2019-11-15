@@ -1,19 +1,39 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import LoginScreen from './components/LoginScreen'
+import SignupScreen from './components/SignupScreen'
+import WelcomeScreen from './components/WelcomeScreen'
+import HomeScreen from './components/HomeScreen'
+import CalendarScreen from './components/CalendarScreen'
+import JournalScreen from './components/JournalScreen'
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Welcome to our mindfulness app :,)</Text>
-    </View>
-  );
-}
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+const AppStack = createBottomTabNavigator({
+  Home: HomeScreen,
+  Calendar: CalendarScreen,
+  Journal: JournalScreen,
 });
+
+const AuthStack = createStackNavigator(
+  {
+    Welcome: WelcomeScreen,
+    Login: LoginScreen,
+    Signup: SignupScreen,
+  },
+  {
+    initialRouteName: 'Welcome'
+  }
+);
+
+export default createAppContainer(
+  createSwitchNavigator(
+    {
+      App: AppStack,
+      Auth: AuthStack,
+    },
+    {
+      initialRouteName: 'Auth'
+    }
+  )
+)
