@@ -28,23 +28,24 @@ export default class WelcomeScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center', 
+    alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
-  }, 
+    marginTop: -100
+  },
   welcomeTitle: {
-    fontFamily:'BodoniSvtyTwoITCTT-Bold',
-    fontSize:50, 
-    padding: 10
-  }, 
+    fontFamily: 'BodoniSvtyTwoITCTT-Bold',
+    fontSize: 50,
+    padding: 10,
+  },
   subTitle: {
     fontFamily: 'AppleSDGothicNeo-Light',
-    fontSize: 15, 
+    fontSize: 15,
   },
   buttonText: {
     fontFamily: 'KohinoorBangla-Semibold',
     fontSize: 30
-  }, 
+  },
   buttonContainer: {
     alignItems: 'center', // center buttons within container 
     marginTop: 50

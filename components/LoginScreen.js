@@ -38,7 +38,7 @@ class LoginScreen extends React.Component {
           <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => this.props.navigation.navigate('Signup')} 
+          onPress={() => this.props.navigation.navigate('Signup')}
         >
           <Text style={styles.signUpLink}> Don't have an account yet? Sign up </Text>
         </TouchableOpacity>
@@ -51,16 +51,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: -100
   },
   welcomeTitle: {
-    fontFamily:'BodoniSvtyTwoITCTT-Bold',
-    fontSize:50, 
+    fontFamily: 'BodoniSvtyTwoITCTT-Bold',
+    fontSize: 50,
     padding: 10
-  }, 
+  },
   signUpLink: {
     fontFamily: 'AppleSDGothicNeo-Light',
-    fontSize: 20, 
+    fontSize: 20,
   },
   inputBox: {
     width: '85%',
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     width: 200
   },
   buttonText: {
-    fontFamily:'KohinoorBangla-Semibold',
+    fontFamily: 'KohinoorBangla-Semibold',
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff'

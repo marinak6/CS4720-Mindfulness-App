@@ -52,13 +52,14 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginTop: -100
     },
     welcomeTitle: {
-        fontFamily:'BodoniSvtyTwoITCTT-Bold',
-        fontSize:50, 
+        fontFamily: 'BodoniSvtyTwoITCTT-Bold',
+        fontSize: 50,
         padding: 10
-    }, 
+    },
     inputBox: {
         width: '85%',
         margin: 10,
@@ -80,11 +81,11 @@ const styles = StyleSheet.create({
         width: 200
     },
     buttonText: {
-        fontFamily:'KohinoorBangla-Semibold',
+        fontFamily: 'KohinoorBangla-Semibold',
         fontSize: 20,
         fontWeight: 'bold',
         color: '#fff'
-      },
+    },
     buttonSignup: {
         fontSize: 12
     }
