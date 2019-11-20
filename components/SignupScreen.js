@@ -16,10 +16,10 @@ class SignupScreen extends React.Component {
             .catch(error => console.log(error))
     }
 
-    // Update styling
     render() {
         return (
             <View style={styles.container}>
+                <Text style={styles.welcomeTitle}> Mindfulness</Text>
                 <TextInput
                     style={styles.inputBox}
                     value={this.state.name}
@@ -41,7 +41,7 @@ class SignupScreen extends React.Component {
                     secureTextEntry={true}
                 />
                 <TouchableOpacity style={styles.button} onPress={this.handleSignUp}>
-                    <Text style={styles.buttonText}>Signup</Text>
+                    <Text style={styles.buttonText}>SIGN UP</Text>
                 </TouchableOpacity>
             </View>
         )
@@ -52,7 +52,13 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginTop: -100
+    },
+    welcomeTitle: {
+        fontFamily: 'BodoniSvtyTwoITCTT-Bold',
+        fontSize: 50,
+        padding: 10
     },
     inputBox: {
         width: '85%',
@@ -68,13 +74,14 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingVertical: 5,
         alignItems: 'center',
-        backgroundColor: '#FFA611',
-        borderColor: '#FFA611',
+        backgroundColor: '#CBBADE',
+        borderColor: '#CBBADE',
         borderWidth: 1,
         borderRadius: 5,
         width: 200
     },
     buttonText: {
+        fontFamily: 'KohinoorBangla-Semibold',
         fontSize: 20,
         fontWeight: 'bold',
         color: '#fff'
