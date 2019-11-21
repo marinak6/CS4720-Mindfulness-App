@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import Constants from 'expo-constants';
-import { Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 class JournalScreen extends React.Component {
@@ -68,14 +68,13 @@ let styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "flex-end",
         width: "100%",
-        paddingLeft: 5,
+        paddingLeft: Constants.statusBarHeight,
         marginBottom: 7,
     },
     day:{
         fontFamily: 'AvenirNextCondensed-Regular',
         fontSize: 24,
         paddingBottom: 3,
-        paddingLeft:10
     },
     date:{
         fontFamily: 'AvenirNextCondensed-UltraLight',
@@ -85,12 +84,12 @@ let styles = StyleSheet.create({
     },
     moodIcons: {
         flexDirection: 'row',
-        paddingRight: 10,
+        paddingRight: Constants.statusBarHeight,
     },
     entry:{
         width: "100%",
-        paddingLeft: 19,
-        paddingRight: 19,
+        paddingLeft: Constants.statusBarHeight,
+        paddingRight: Constants.statusBarHeight,
         paddingTop: 20,
         paddingBottom: 20,
         borderColor: '#70757A',
@@ -98,7 +97,6 @@ let styles = StyleSheet.create({
         height: "85%",
         fontSize: 16,
     }
-
 })
 
 export default JournalScreen
