@@ -478,14 +478,13 @@ let styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "flex-end",
         width: "100%",
-        paddingLeft: 5,
+        paddingLeft: Constants.statusBarHeight,
         marginBottom: 7,
     },
     day:{
         fontFamily: 'AvenirNextCondensed-Regular',
         fontSize: 24,
         paddingBottom: 3,
-        paddingLeft:10
     },
     date:{
         fontFamily: 'AvenirNextCondensed-UltraLight',
@@ -495,13 +494,13 @@ let styles = StyleSheet.create({
     },
     moodIcons: {
         flexDirection: 'row',
-        paddingRight: 10,
+        paddingRight: Constants.statusBarHeight,
     },
     main: {
         flex: 1,
         width: "100%",
-        paddingLeft: 10,
-        paddingRight: 10,
+        paddingLeft: Constants.statusBarHeight,
+        paddingRight: Constants.statusBarHeight,
         paddingTop: 10,
         paddingBottom: 10,
         borderColor: '#70757A',
