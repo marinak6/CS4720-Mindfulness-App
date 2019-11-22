@@ -1,21 +1,47 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import Constants from 'expo-constants';
+import moment from "moment";
+import Firebase from '../Firebase'
 import { Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 class HomeScreen extends React.Component {
+    constructor(props) {
+        super(props);
+        this.getEntry.bind(this)
+    }
+    getEntry = () => {
+        date = moment().format('YYYY-MM-DD')
+        email = Firebase.auth().currentUser.email;
+        entry = Firebase.firestore().collection('users').doc("" + email).collection(date).doc("text");
+        entry.get().then((e) => {
+            if (e.exists) {
+                text = e.data().value;
+                this.props.navigation.navigate('Journal', {
+                    text: text,
+                    date: date
+                });
+            }
+            else {
+                this.props.navigation.navigate('Journal', {
+                    text: "",
+                    date: date
+                });
+            }
+        })
+    }
     render() {
         return (
             <View style={styles.container}>
                 <Text style={styles.feelingText}> How Are You Today?</Text>
                 <View style={styles.moodIcons}>
-                    <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal')} style={styles.mood}>
+                    <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
                         <MaterialCommunityIcons name="emoticon-neutral" color="#cbbade" size={55} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal')} style={styles.mood}>
+                    <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
                         <MaterialCommunityIcons name="emoticon-happy" color="#cbbade" size={55} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal')} style={styles.mood}>
+                    <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
                         <MaterialCommunityIcons name="emoticon-sad" color="#cbbade" size={55} />
                     </TouchableOpacity>
                 </View>

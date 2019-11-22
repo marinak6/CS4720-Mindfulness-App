@@ -8,7 +8,18 @@ class JournalScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { entry: ''};
+        this.state = {
+            entry: '',
+            date: '2019-11-21'
+        };
+    }
+    componentDidMount() {
+        if (this.props.navigation.state.params.text != undefined) {
+            this.setState({
+                entry: this.props.navigation.state.params.text,
+                date: this.props.navigation.state.params.date
+            })
+        }
     }
 
     render() {
@@ -16,16 +27,16 @@ class JournalScreen extends React.Component {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <View style={styles.container}>
                     <View style={styles.title}>
-                        <View style={{flexDirection: "row", alignItems: "flex-end",}}>
-                            <Text style = {styles.day}>Today</Text>
-                            <Text style = {styles.date}>11/15/19</Text>
+                        <View style={{ flexDirection: "row", alignItems: "flex-end", }}>
+                            <Text style={styles.day}>Date</Text>
+                            <Text style={styles.date}>{this.state.date}</Text>
                         </View>
-                        
+
                         <View style={styles.moodIcons}>
-                            <TouchableOpacity style={{marginRight:10}}>
+                            <TouchableOpacity style={{ marginRight: 10 }}>
                                 <MaterialCommunityIcons name="emoticon-sad" color="#cbbade" size={35} />
                             </TouchableOpacity>
-                            <TouchableOpacity style={{marginRight:10}}>
+                            <TouchableOpacity style={{ marginRight: 10 }}>
                                 <MaterialCommunityIcons name="emoticon-neutral" color="#cbbade" size={35} />
                             </TouchableOpacity>
                             <TouchableOpacity>
@@ -33,23 +44,23 @@ class JournalScreen extends React.Component {
                             </TouchableOpacity>
                         </View>
                     </View>
-                
-                    
-                    <TextInput 
-                        multiline 
-                        autogrow 
+
+
+                    <TextInput
+                        multiline
+                        autogrow
                         scrollEnabled
                         placeholder="How was your day?"
-                        placeholderTextColor = "#70757A" 
+                        placeholderTextColor="#70757A"
                         style={styles.entry}
-                        onChangeText = {text => this.setState({entry: text})}
-                        value = {this.state.entry}
+                        onChangeText={text => this.setState({ entry: text })}
+                        value={this.state.entry}
                     />
 
                     <TouchableOpacity>
                         <Ionicons name="ios-add-circle-outline" color="#cbbade" size={55} />
                     </TouchableOpacity>
-                            
+
                 </View>
             </TouchableWithoutFeedback>
         )
@@ -57,13 +68,13 @@ class JournalScreen extends React.Component {
 }
 
 let styles = StyleSheet.create({
-    container:{
+    container: {
         flex: 1,
         flexDirection: 'column',
         paddingTop: Constants.statusBarHeight,
         alignItems: "center",
-    }, 
-    title:{
+    },
+    title: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "flex-end",
@@ -71,23 +82,23 @@ let styles = StyleSheet.create({
         paddingLeft: 5,
         marginBottom: 7,
     },
-    day:{
+    day: {
         fontFamily: 'AvenirNextCondensed-Regular',
         fontSize: 24,
         paddingBottom: 3,
-        paddingLeft:10
+        paddingLeft: 10
     },
-    date:{
+    date: {
         fontFamily: 'AvenirNextCondensed-UltraLight',
         fontSize: 18,
         paddingBottom: 6,
-        paddingLeft:10
+        paddingLeft: 10
     },
     moodIcons: {
         flexDirection: 'row',
         paddingRight: 10,
     },
-    entry:{
+    entry: {
         width: "100%",
         paddingLeft: 19,
         paddingRight: 19,
