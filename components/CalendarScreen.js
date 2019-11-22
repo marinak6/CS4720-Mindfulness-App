@@ -1,6 +1,7 @@
 import React from 'react'
 import Firebase from '../Firebase'
-import { View, Text } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native';
+import Constants from "expo-constants";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 
 class CalendarScreen extends React.Component {
@@ -32,7 +33,7 @@ class CalendarScreen extends React.Component {
     }
     render() {
         return (
-            <View>
+            <View style={styles.container}>
                 <Text>Calendar!</Text>
                 <Calendar
                     // Initially visible month. Default = Date()
@@ -93,4 +94,12 @@ class CalendarScreen extends React.Component {
         )
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingTop: Constants.statusBarHeight,
+    }
+})
+
 export default CalendarScreen

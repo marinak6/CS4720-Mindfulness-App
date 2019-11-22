@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default class WelcomeScreen extends React.Component {
@@ -31,7 +31,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
-    marginTop: -100
   },
   welcomeTitle: {
     fontFamily: 'BodoniSvtyTwoITCTT-Bold',
