@@ -11,20 +11,17 @@ class CalendarScreen extends React.Component {
     }
 
     getEntry = (date) => {
-        email = Firebase.auth().currentUser.email;
-        entry = Firebase.firestore().collection('users').doc("" + email).collection(date).doc("text");
-        console.log(date)
+        uid = Firebase.auth().currentUser.uid;
+        entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc(""+ date);
         entry.get().then((e) => {
             if (e.exists) {
-                text = e.data().value;
-                text
+                text = e.data().text;
                 this.props.navigation.navigate('Journal', {
                     text: text,
                     date: date
                 });
             }
             else {
-                console.log(date)
                 this.props.navigation.navigate('Journal', {
                     text: "",
                     date: date

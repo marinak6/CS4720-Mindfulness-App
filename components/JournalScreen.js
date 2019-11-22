@@ -41,19 +41,19 @@ class JournalScreen extends React.Component {
     }
     addToFirebase = () => {
         uid = Firebase.auth().currentUser.uid;
-        Firebase.firestore().collection('users').doc("" + uid).set({
+        Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date).set({
             date: "" + this.state.date,
-            text: "" + this.state.value,
+            text: JSON.stringify(this.state.value),
         })
+        this.props.navigation.navigate('Calendar')
     }
     onFocusFunction = () => {
         if (this.props.navigation.state.params != undefined) {
-
             if (this.props.navigation.state.params.text === "") {
                 v = [getInitialObject()];
             }
             else {
-                v = this.props.navigation.state.params.text;
+                v = JSON.parse(this.props.navigation.state.params.text);
             }
             this.setState({
                 value: v,
@@ -133,7 +133,6 @@ class JournalScreen extends React.Component {
             aspect: [4, 4],
             base64: false,
         });
-        console.log(result);
 
         this.insertImage(result.uri);
     };
@@ -165,7 +164,7 @@ class JournalScreen extends React.Component {
 
     onRemoveImage = ({ url, id }) => {
         // do what you have to do after removing an image
-        console.log(`image removed (url : ${url})`);
+        //console.log(`image removed (url : ${url})`);
 
     }
 
@@ -314,8 +313,6 @@ class JournalScreen extends React.Component {
     }
 
     render() {
-        console.log(this.state)
-        console.log(this.props.navigation.state.params)
         return (
             <View style={styles.container}>
                 <KeyboardListener
