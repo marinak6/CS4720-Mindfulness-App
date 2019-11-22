@@ -15,15 +15,11 @@ class HomeScreen extends React.Component {
     }
 
     async getQuote(){
-        //temp joke api
-        let response = await fetch("http://api.icndb.com/jokes/random?limitTo=[nerdy]&firstName=Prof&lastName=X")
-        //quote of the day api
-        //let response = await fetch("http://quotes.rest/qod.json?category=inspire")
+        let response = await fetch("http://quotes.rest/qod.json?category=inspire")
         let parseObject = await response.json()
         console.log(parseObject)
         this.setState({
-            quote: parseObject.value.joke
-            //quote: parseObject.contents.quotes[0].quote
+            quote: parseObject.contents.quotes[0].quote
         })
     }
 
