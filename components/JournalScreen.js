@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback } from 'react-native'
 import Constants from 'expo-constants';
+import moment from "moment";
 import { Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -9,12 +10,13 @@ class JournalScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            entry: '',
-            date: '2019-11-21'
+            entry: "",
+            date: moment().format('YYYY-MM-DD')
         };
     }
+
     componentDidMount() {
-        if (this.props.navigation.state.params.text != undefined) {
+        if (this.props != undefined) {
             this.setState({
                 entry: this.props.navigation.state.params.text,
                 date: this.props.navigation.state.params.date
