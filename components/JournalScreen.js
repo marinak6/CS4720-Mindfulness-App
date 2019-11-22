@@ -21,8 +21,8 @@ class JournalScreen extends React.Component {
     constructor(props) {
         super(props);
         this.customStyles = {
-            ...defaultStyles, body: { fontSize: 12 }, heading: { fontSize: 16 }
-            , title: { fontSize: 20 }, ol: { fontSize: 12 }, ul: { fontSize: 12 }, bold: { fontSize: 12, fontWeight: 'bold', color: 'black' }
+            ...defaultStyles, body: { fontSize: 16 }, heading: { fontSize: 16 }
+            , title: { fontSize: 20 }, ol: { fontSize: 16 }, ul: { fontSize: 16 }, bold: { fontSize: 16, fontWeight: 'bold', color: 'black' }
         };
         this.state = {
             selectedTag: 'body',
@@ -322,7 +322,6 @@ class JournalScreen extends React.Component {
 
                 <View style={styles.title}>
                     <View style={{ flexDirection: "row", alignItems: "flex-end", }}>
-                        <Text style={styles.day}>Date</Text>
                         <Text style={styles.date}>{this.state.date}</Text>
                     </View>
                     <View style={styles.moodIcons}>
@@ -335,7 +334,7 @@ class JournalScreen extends React.Component {
                         <TouchableOpacity>
                             <MaterialCommunityIcons name="emoticon-happy" color="#cbbade" size={35} />
                         </TouchableOpacity>
-                        {(this.state.keyboardOpen == true) ? <Button onPress={Keyboard.dismiss} title="Done" /> : <View />}
+                        {(this.state.keyboardOpen == true) ? <Button onPress={Keyboard.dismiss} title="Done" color="#cbbade" /> : <View />}
                     </View>
                 </View>
 
@@ -505,29 +504,29 @@ let styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "flex-end",
         width: "100%",
-        paddingLeft: Constants.statusBarHeight,
-        marginBottom: 7,
+        paddingLeft: 20,
+        paddingBottom: 5,
+        marginBottom: 5,
+        height: Constants.statusBarHeight
     },
-    day: {
-        fontFamily: 'AvenirNextCondensed-Regular',
+    done: {
+        fontFamily: 'AppleSDGothicNeo-Regular',
         fontSize: 24,
-        paddingBottom: 3,
+        color: '#cbbade'
     },
     date: {
-        fontFamily: 'AvenirNextCondensed-UltraLight',
+        fontFamily: 'AppleSDGothicNeo-Light',
         fontSize: 18,
         paddingBottom: 6,
         paddingLeft: 10
     },
     moodIcons: {
         flexDirection: 'row',
-        paddingRight: Constants.statusBarHeight,
+        paddingRight: 20,
     },
     main: {
         flex: 1,
         width: "100%",
-        paddingLeft: Constants.statusBarHeight,
-        paddingRight: Constants.statusBarHeight,
         paddingTop: 10,
         paddingBottom: 10,
         borderColor: '#70757A',
