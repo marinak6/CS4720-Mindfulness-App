@@ -9,14 +9,15 @@ class JournalScreen extends React.Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
-            entry: "",
-            date: moment().format('YYYY-MM-DD')
+            entry: this.props.navigation.state.params.text,
+            date: this.props.navigation.state.params.date
         };
     }
 
     componentDidMount() {
-        if (this.props != undefined) {
+        if (this.props.navigation.state.params != undefined) {
             this.setState({
                 entry: this.props.navigation.state.params.text,
                 date: this.props.navigation.state.params.date
@@ -25,6 +26,8 @@ class JournalScreen extends React.Component {
     }
 
     render() {
+        console.log(this.state)
+        console.log(this.props.navigation.state.params)
         return (
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <View style={styles.container}>

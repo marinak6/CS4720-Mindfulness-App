@@ -41,7 +41,7 @@ class HomeScreen extends React.Component {
                     <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
                         <MaterialCommunityIcons name="emoticon-happy" color="#cbbade" size={55} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
+                    <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal')} style={styles.mood}>
                         <MaterialCommunityIcons name="emoticon-sad" color="#cbbade" size={55} />
                     </TouchableOpacity>
                 </View>
