@@ -3,16 +3,21 @@ import Firebase from '../Firebase'
 import { View, Text, StyleSheet } from 'react-native';
 import Constants from "expo-constants";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+import moment from "moment";
+
 
 class CalendarScreen extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            selected: moment().format('YYYY-MM-DD')
+        }
         this.getEntry.bind(this)
     }
 
     getEntry = (date) => {
         uid = Firebase.auth().currentUser.uid;
-        entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc(""+ date);
+        entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + date);
         entry.get().then((e) => {
             if (e.exists) {
                 text = e.data().text;
@@ -28,20 +33,18 @@ class CalendarScreen extends React.Component {
                 });
             }
         })
+        this.setState({
+            selected: date,
+        })
     }
     render() {
         return (
             <View style={styles.container}>
-                <Text>Calendar!</Text>
+                <Text style={styles.calendarText}>Calendar</Text>
                 <Calendar
-                    // Initially visible month. Default = Date()
                     current={'2019-11-14'}
-                    // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-                    // minDate={'2019-01-01'}
-                    // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-                    // maxDate={'2019-12-31'}
-                    // Handler which gets executed on day press. Default = undefined
-                    //onDayPress={() => this.props.navigation.navigate('Journal')}
+                    markedDates={{ [this.state.selected]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' } }}
+
                     onDayPress={(date) => { this.getEntry(date.dateString) }}
                     // Handler which gets executed on day long press. Default = undefined
                     onDayLongPress={(day) => { console.log('selected day', day) }}
@@ -68,16 +71,18 @@ class CalendarScreen extends React.Component {
                     style={{
                         borderWidth: 1,
                         borderColor: 'gray',
-                        height: 350
+                        width: '85%',
+
                     }}
                     // Specify theme properties to override specific styles for calendar parts. Default = {}
                     theme={{
                         backgroundColor: '#ffffff',
                         calendarBackground: '#ffffff',
-                        selectedDayBackgroundColor: '#00adf5',
+                        selectedDayBackgroundColor: '#CBBADE',
                         selectedDayTextColor: '#ffffff',
-                        todayTextColor: '#00adf5',
+                        todayTextColor: '#383838',
                         textDisabledColor: '#d9e1e8',
+                        arrowColor: '#CBBADE',
                         dotColor: '#00adf5',
                         selectedDotColor: '#ffffff',
                         textDayFontWeight: '300',
@@ -85,6 +90,8 @@ class CalendarScreen extends React.Component {
                         textDayHeaderFontWeight: '300',
                         textDayFontSize: 16,
                         textMonthFontSize: 16,
+                        monthTextColor: '#383838',
+                        dayTextColor: '#383838',
                         textDayHeaderFontSize: 16
                     }}
                 />
@@ -93,11 +100,25 @@ class CalendarScreen extends React.Component {
     }
 }
 
+export default CalendarScreen
+
+
 const styles = StyleSheet.create({
+
     container: {
         flex: 1,
-        paddingTop: Constants.statusBarHeight,
-    }
-})
+        height: "100%",
+        width: "100%",
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',
+    },
+    calendarText: {
+        //marginTop: '-25%',
+        fontFamily: 'BodoniSvtyTwoITCTT-Bold',
+        margin: 10,
+        fontSize: 35,
+        color: '#383838'
+    },
 
-export default CalendarScreen
+});
