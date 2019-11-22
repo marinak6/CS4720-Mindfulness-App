@@ -1,11 +1,12 @@
-import React from 'react'
-import { View, Text } from 'react-native'
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import Constants from "expo-constants";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 
 class CalendarScreen extends React.Component {
     render() {
         return (
-            <View>
+            <View style ={styles.container}>
                 <Text>Calendar!</Text>
                 <Calendar
                     // Initially visible month. Default = Date()
@@ -65,4 +66,12 @@ class CalendarScreen extends React.Component {
         )
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingTop: Constants.statusBarHeight, 
+    }
+})
+
 export default CalendarScreen

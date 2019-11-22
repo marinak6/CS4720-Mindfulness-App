@@ -499,8 +499,8 @@ let styles = StyleSheet.create({
     main: {
         flex: 1,
         width: "100%",
-        paddingLeft: 10,
-        paddingRight: 10,
+        paddingLeft: Constants.statusBarHeight,
+        paddingRight: Constants.statusBarHeight,
         paddingTop: 10,
         paddingBottom: 10,
         borderColor: '#70757A',
