@@ -1,10 +1,11 @@
 import React from 'react'
 import moment from "moment";
+import Firebase from '../Firebase'
 import { View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Dimensions } from 'react-native'
 import Constants, { Permissions, ImagePicker } from 'expo-constants';
 import { Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import CNRichTextEditor, { CNToolbar, getDefaultStyles, convertToObject } from "react-native-cn-richtext-editor";
+import CNRichTextEditor, { CNToolbar, getDefaultStyles, convertToObject, getInitialObject } from "react-native-cn-richtext-editor";
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuContext, MenuProvider, renderers } from 'react-native-popup-menu';
 import KeyboardListener from 'react-native-keyboard-listener';
 
@@ -31,25 +32,39 @@ class JournalScreen extends React.Component {
             highlights: ['yellow_hl', 'pink_hl', 'orange_hl', 'green_hl', 'purple_hl', 'blue_hl'],
             selectedStyles: [],
             // value: [getInitialObject()] get empty editor
-            value: convertToObject('<div><p><span>This is </span><span style="font-weight: bold;">bold</span><span> and </span><span style="font-style: italic;">italic </span><span>text</span></p></div>'
-                , this.customStyles),
+            value: [getInitialObject()],
             keyboardOpen: null,
-            entry: this.props.navigation.state.params.text,
-            date: this.props.navigation.state.params.date
+            date: moment().format('YYYY-MM-DD')
         };
 
         this.editor = null;
     }
-
-
-
-    componentDidMount() {
+    addToFirebase = () => {
+        uid = Firebase.auth().currentUser.uid;
+        Firebase.firestore().collection('users').doc("" + uid).set({
+            date: "" + this.state.date,
+            text: "" + this.state.value,
+        })
+    }
+    onFocusFunction = () => {
         if (this.props.navigation.state.params != undefined) {
+
+            if (this.props.navigation.state.params.text === "") {
+                v = [getInitialObject()];
+            }
+            else {
+                v = this.props.navigation.state.params.text;
+            }
             this.setState({
-                entry: this.props.navigation.state.params.text,
+                value: v,
                 date: this.props.navigation.state.params.date
             })
         }
+    }
+    componentDidMount() {
+        this.focusListener = this.props.navigation.addListener('didFocus', () => {
+            this.onFocusFunction()
+        })
 
     }
     onStyleKeyPress = (toolType) => {
@@ -310,8 +325,8 @@ class JournalScreen extends React.Component {
 
                 <View style={styles.title}>
                     <View style={{ flexDirection: "row", alignItems: "flex-end", }}>
-                        <Text style={styles.day}>Today</Text>
-                        <Text style={styles.date}>11/15/19</Text>
+                        <Text style={styles.day}>Date</Text>
+                        <Text style={styles.date}>{this.state.date}</Text>
                     </View>
                     <View style={styles.moodIcons}>
                         <TouchableOpacity style={{ marginRight: 10 }}>
@@ -367,7 +382,7 @@ class JournalScreen extends React.Component {
                         </View>
 
                         {(this.state.keyboardOpen == false) ?
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={this.addToFirebase}>
                                 <Ionicons name="ios-add-circle-outline" color="#cbbade" size={55} />
                             </TouchableOpacity> :
 

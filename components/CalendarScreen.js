@@ -17,6 +17,7 @@ class CalendarScreen extends React.Component {
         entry.get().then((e) => {
             if (e.exists) {
                 text = e.data().value;
+                text
                 this.props.navigation.navigate('Journal', {
                     text: text,
                     date: date
