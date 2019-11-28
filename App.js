@@ -2,13 +2,14 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import React from 'react';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, FontAwesome, SimpleLineIcons } from '@expo/vector-icons';
 import LoginScreen from './components/LoginScreen'
 import SignupScreen from './components/SignupScreen'
 import WelcomeScreen from './components/WelcomeScreen'
 import HomeScreen from './components/HomeScreen'
 import CalendarScreen from './components/CalendarScreen'
 import JournalScreen from './components/JournalScreen'
+import Firebase from './Firebase'
 
 
 const AppStack = createBottomTabNavigator(
