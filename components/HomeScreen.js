@@ -3,7 +3,10 @@ import { View, Text, StyleSheet } from 'react-native'
 import Constants from 'expo-constants';
 import moment from "moment";
 import Firebase from '../Firebase'
-import { Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+    Ionicons, FontAwesome, MaterialCommunityIcons,
+    SimpleLineIcons
+} from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 class HomeScreen extends React.Component {
 
@@ -46,25 +49,37 @@ class HomeScreen extends React.Component {
         })
     }
 
+    handleLogout = () => {
+        Firebase.auth()
+            .signOut()
+            .then(() => this.props.navigation.navigate('Welcome'))
+            .catch(error => console.log(error))
+    }
+
     render() {
         return (
-            <View style={styles.container}>
-                <Text style={styles.feelingText}> How Are You Today?</Text>
-                <View style={styles.moodIcons}>
-                    <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
-                        <MaterialCommunityIcons name="emoticon-sad" color="#cbbade" size={55} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
-                        <MaterialCommunityIcons name="emoticon-neutral" color="#cbbade" size={55} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal')} style={styles.mood}>
-                        <MaterialCommunityIcons name="emoticon-happy" color="#cbbade" size={55} />
-                    </TouchableOpacity>
-                </View>
+            <View style={styles.screen}>
+                <TouchableOpacity onPress={this.handleLogout} style={styles.logout}>
+                    <SimpleLineIcons name="logout" color="#383838" size={25} />
+                </TouchableOpacity>
+                <View style={styles.container}>
+                    <Text style={styles.feelingText}> How Are You Today?</Text>
+                    <View style={styles.moodIcons}>
+                        <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
+                            <MaterialCommunityIcons name="emoticon-sad" color="#cbbade" size={55} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
+                            <MaterialCommunityIcons name="emoticon-neutral" color="#cbbade" size={55} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal')} style={styles.mood}>
+                            <MaterialCommunityIcons name="emoticon-happy" color="#cbbade" size={55} />
+                        </TouchableOpacity>
+                    </View>
 
-                <View style={styles.quoteContainer}>
-                    {/* <Text>Quote of the Day</Text> */}
-                    <Text style={styles.quoteText}>{this.state.quote}</Text>
+                    <View style={styles.quoteContainer}>
+                        {/* <Text>Quote of the Day</Text> */}
+                        <Text style={styles.quoteText}>{this.state.quote}</Text>
+                    </View>
                 </View>
             </View>
         )
@@ -73,7 +88,13 @@ class HomeScreen extends React.Component {
 export default HomeScreen
 
 const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        height: "100%",
+        width: "100%",
+        flexDirection: 'column',
 
+    },
     container: {
         flex: 1,
         height: "100%",
@@ -106,6 +127,12 @@ const styles = StyleSheet.create({
         fontFamily: 'AppleSDGothicNeo-Light',
         textAlign: 'center',
         color: '#383838',
+    },
+    logout: {
+        marginTop: 40,
+        marginLeft: 20,
+        justifyContent: 'flex-start',
+        alignSelf: 'flex-start'
     }
 });
 
