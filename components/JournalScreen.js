@@ -2,7 +2,9 @@ import React from 'react'
 import moment from "moment";
 import Firebase from '../Firebase'
 import { View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Dimensions } from 'react-native'
-import Constants, { Permissions, ImagePicker } from 'expo-constants';
+import Constants from 'expo-constants';
+import * as Permissions from 'expo-permissions';
+import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import CNRichTextEditor, { CNToolbar, getDefaultStyles, convertToObject, getInitialObject } from "react-native-cn-richtext-editor";
@@ -108,6 +110,7 @@ class JournalScreen extends React.Component {
     askPermissionsAsync = async () => {
         const camera = await Permissions.askAsync(Permissions.CAMERA);
         const cameraRoll = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
 
         this.setState({
             hasCameraPermission: camera.status === 'granted',
