@@ -79,32 +79,28 @@ class CalendarScreen extends React.Component {
         })
     }
 
-    componentDidMount() {
+    componentDidMount =()=> {
         uid = Firebase.auth().currentUser.uid;
         datesRef = Firebase.firestore().collection('users').doc("" + uid).collection('dates')
-
-        datesRef.get().then(function(querySnapshot) {
-            querySnapshot.forEach(function(doc) {
-                // doc.data() is never undefined for query doc snapshots
-                console.log(doc.id, " => ", doc.data());
+        let datesObj = {someThing: "hi"}
+        datesRef.get().then((querySnapshot)=> {
+            querySnapshot.forEach(function(doc) { 
+                datesObj[""+doc.id] = [{
+                    date: doc.data.date,
+                    text: doc.data.text
+                }]
+                    
+                
             });
+            this.setState({
+                olderEntries: datesObj
+            })
         })
         .catch(function(error) {
             console.log("Error getting documents: ", error);
         });
-        // fireRef.on("value", snapshot => {
-        //   let allChallenges = snapshot.val();
-        //   let tempList = [];
-        //   for (let challenge in allChallenges) {
-        //     tempList.push({
-        //       key: challenge,
-        //       title: allChallenges[challenge].title,
-        //       text: allChallenges[challenge].text,
-        //       date: allChallenges[challenge].date,
-        //       time: allChallenges[challenge].time,
-        //       submission: allChallenges[challenge].submission
-        //     });
-        //   }
+        
+        
         //   this.setState({
         //     challengeArray: tempList
         //   });
@@ -175,13 +171,13 @@ class CalendarScreen extends React.Component {
                         .toString(),
                         10
                     )}
-                    items={appointments}
+                    items={this.state.olderEntries}
                     renderItem={item => (
                         <View style={[styles.item]}>
                         <Text
                             style={{ color: '#6a6a6a' }}
                         >
-                            {item.time} &mdash; {item.title}
+                            {item.date}
                         </Text>
                         </View>
                     )}
