@@ -5,6 +5,47 @@ import Constants from "expo-constants";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import moment from "moment";
 
+const appointments = {
+    '2019-09-14': [
+      {
+        key: 32,
+        year: '2019',
+        month: '7',
+        day: '11',
+        mins: '00',
+        hour: '21',
+        time: '09:00 PM',
+        title: 'Shave (Customer1)',
+        date: '2019-09-14'
+      }
+    ],
+    '2019-09-15': [
+      {
+        key: 32,
+        year: '2019',
+        month: '7',
+        day: '11',
+        mins: '00',
+        hour: '21',
+        time: '09:00 PM',
+        title: 'Shave (Customer1)',
+        date: '2019-09-14'
+      }
+    ],
+    '2019-09-16': [
+      {
+        key: 32,
+        year: '2019',
+        month: '7',
+        day: '11',
+        mins: '00',
+        hour: '21',
+        time: '09:00 PM',
+        title: 'Shave (Customer1)',
+        date: '2019-09-14'
+      }
+    ],
+}
 
 class CalendarScreen extends React.Component {
     constructor(props) {
@@ -37,11 +78,43 @@ class CalendarScreen extends React.Component {
             selected: date,
         })
     }
+
+    componentDidMount() {
+        uid = Firebase.auth().currentUser.uid;
+        datesRef = Firebase.firestore().collection('users').doc("" + uid).collection('dates')
+
+        datesRef.get().then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                // doc.data() is never undefined for query doc snapshots
+                console.log(doc.id, " => ", doc.data());
+            });
+        })
+        .catch(function(error) {
+            console.log("Error getting documents: ", error);
+        });
+        // fireRef.on("value", snapshot => {
+        //   let allChallenges = snapshot.val();
+        //   let tempList = [];
+        //   for (let challenge in allChallenges) {
+        //     tempList.push({
+        //       key: challenge,
+        //       title: allChallenges[challenge].title,
+        //       text: allChallenges[challenge].text,
+        //       date: allChallenges[challenge].date,
+        //       time: allChallenges[challenge].time,
+        //       submission: allChallenges[challenge].submission
+        //     });
+        //   }
+        //   this.setState({
+        //     challengeArray: tempList
+        //   });
+        // });
+      }
     render() {
         return (
             <View style={styles.container}>
                 <Text style={styles.calendarText}>Calendar</Text>
-                <Calendar
+                {/* <Calendar
                     current={'2019-11-14'}
                     markedDates={{ [this.state.selected]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' } }}
 
@@ -94,6 +167,38 @@ class CalendarScreen extends React.Component {
                         dayTextColor: '#383838',
                         textDayHeaderFontSize: 16
                     }}
+                /> */}
+                <Agenda
+                    firstDay={parseInt(
+                        moment(new Date())
+                        .day()
+                        .toString(),
+                        10
+                    )}
+                    items={appointments}
+                    renderItem={item => (
+                        <View style={[styles.item]}>
+                        <Text
+                            style={{ color: '#6a6a6a' }}
+                        >
+                            {item.time} &mdash; {item.title}
+                        </Text>
+                        </View>
+                    )}
+                    renderEmptyData={() => <View style={{ flex: 1, flexDirection:'column',justifyContent: 'center', alignItems: 'center' }}><Text>No saved entry</Text></View>}
+                    rowHasChanged={(r1, r2) => r1.title !== r2.title}
+                    theme={{
+                        agendaDayNumColor: '#CBBADE',
+                        agendaDayTextColor: '#CBBADE',
+                        agendaKnobColor: '#efefef',
+                        agendaTodayColor: '#CBBADE',
+                        dotColor: '#CBBADE',
+                        todayTextColor: '#CBBADE',
+                        selectedDayBackgroundColor: '#CBBADE',
+                        'stylesheet.calendar.header': {
+                        week: { marginTop: 0, flexDirection: 'row', justifyContent: 'space-between' }
+                        }
+                    }}
                 />
             </View>
         )
@@ -107,10 +212,10 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        height: "100%",
-        width: "100%",
-        justifyContent: 'center',
-        alignItems: 'center',
+        // height: "100%",
+        // width: "100%",
+        // justifyContent: 'center',
+        // alignItems: 'center',
         backgroundColor: 'white',
     },
     calendarText: {
@@ -120,5 +225,13 @@ const styles = StyleSheet.create({
         fontSize: 35,
         color: '#383838'
     },
+    item: {
+        backgroundColor: 'white',
+        flex: 1,
+        borderRadius: 5,
+        padding: 10,
+        marginRight: 10,
+        marginTop: 17
+      },
 
 });
