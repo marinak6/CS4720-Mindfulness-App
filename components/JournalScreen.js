@@ -156,6 +156,11 @@ class JournalScreen extends React.Component {
             base64: false,
         });
 
+        if(!result.cancelled){
+            var randomName = uuid.v4()
+            this.uploadImage(result.uri,randomName )
+        }
+
     };
 
     onImageSelectorClicked = (value) => {
