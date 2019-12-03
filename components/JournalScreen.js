@@ -167,13 +167,31 @@ class JournalScreen extends React.Component {
         })
     }
     onFocusFunction = () => {
-        if (this.props.navigation.state.params != undefined) {
-            if (this.props.navigation.state.params.text === "") {
-                v = [getInitialObject()];
-            }
-            else {
-                v = JSON.parse(this.props.navigation.state.params.text);
-            }
+        v = undefined;
+        if (this.props.navigation.state.params == undefined) {
+            uid = Firebase.auth().currentUser.uid;
+            console.log(this.state.date)
+            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
+            entry.get().then((e) => {
+                if (e.exists) {
+                    v = e.data().text
+                    // gets the text from firebase
+                    console.log(v)
+
+                    // if there is no text in firebase
+                    if (v == undefined) {
+                        console.log("hi")
+                        v = [getInitialObject()];
+                    }
+                    // somehow v is undefined here
+                    this.setState({
+                        value: v,
+                    })
+                }
+            })
+        }
+        else {
+            v = JSON.parse(this.props.navigation.state.params.text);
             this.setState({
                 value: v,
                 date: this.props.navigation.state.params.date
