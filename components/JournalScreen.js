@@ -12,6 +12,8 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuContext, MenuProvider, 
 import KeyboardListener from 'react-native-keyboard-listener';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import uuid from 'uuid';
+
 
 
 const { SlideInMenu } = renderers;
@@ -233,6 +235,18 @@ class JournalScreen extends React.Component {
         });
     };
 
+    uploadImage = async (uri, imageName) => {
+        const response = await fetch(uri)
+        const blob = await response.blob()
+        var ref = Firebase.storage().ref().child("images/" + imageName)
+        const snapshot = await ref.put(blob);
+        blob.close();
+        let getNewUrl = await snapshot.ref.getDownloadURL();
+
+        this.insertImage(getNewUrl);
+
+    }
+
     useLibraryHandler = async () => {
         await this.askPermissionsAsync();
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -241,7 +255,11 @@ class JournalScreen extends React.Component {
             base64: false,
         });
 
-        this.insertImage(result.uri);
+        if (!result.cancelled) {
+            var randomName = uuid.v4()
+            this.uploadImage(result.uri, randomName)
+        }
+
     };
 
     useCameraHandler = async () => {
@@ -252,7 +270,11 @@ class JournalScreen extends React.Component {
             base64: false,
         });
 
-        this.insertImage(result.uri);
+        if (!result.cancelled) {
+            var randomName = uuid.v4()
+            this.uploadImage(result.uri, randomName)
+        }
+
     };
 
 
