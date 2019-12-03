@@ -1,15 +1,18 @@
 import React from 'react'
 import moment from "moment";
 import Firebase from '../Firebase'
-import { View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Dimensions } from 'react-native'
+import { Modal, View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Dimensions } from 'react-native'
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
-import { Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { EvilIcons, Ionicons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import CNRichTextEditor, { CNToolbar, getDefaultStyles, convertToObject, getInitialObject } from "react-native-cn-richtext-editor";
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuContext, MenuProvider, renderers } from 'react-native-popup-menu';
 import KeyboardListener from 'react-native-keyboard-listener';
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
+
 
 const { SlideInMenu } = renderers;
 
@@ -36,18 +39,130 @@ class JournalScreen extends React.Component {
             // value: [getInitialObject()] get empty editor
             value: [getInitialObject()],
             keyboardOpen: null,
-            date: moment().format('YYYY-MM-DD')
+            date: moment().format('YYYY-MM-DD'),
+            mapVisible: false,
+            location: "",
+            mapRegion: "",
         };
 
         this.editor = null;
     }
     addToFirebase = () => {
         uid = Firebase.auth().currentUser.uid;
-        Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date).set({
-            date: "" + this.state.date,
-            text: JSON.stringify(this.state.value),
+        entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
+        entry.get().then((e) => {
+            if (e.exists) {
+                entry.update({
+                    date: "" + this.state.date,
+                    text: JSON.stringify(this.state.value),
+                })
+            }
+            else {
+                entry.set({
+                    date: "" + this.state.date,
+                    text: JSON.stringify(this.state.value),
+                })
+            }
         })
         this.props.navigation.navigate('Calendar')
+    }
+    openMap = () => {
+        if (this.state.location == "") {
+            loc = this.getLocation();
+            if (loc == undefined) {
+                // sets state of location and region
+                this.getCurrentLocation();
+                // need to push this to firebase and render map
+            }
+            else {
+                this.setState({
+                    location: loc.location,
+                    mapRegion: {
+                        latitude: loc.location.latitude,
+                        longitude: loc.location.longitude,
+                        latitudeDelta: 0.0922,
+                        longitudeDelta: 0.0421
+                    },
+                    mapVisible: true
+                })
+            }
+        }
+        else {
+            this.setState({ mapVisible: true })
+        }
+
+    }
+
+    closeMap = () => {
+        this.setState({ mapVisible: false });
+    }
+    getLocation = () => {
+        uid = Firebase.auth().currentUser.uid;
+        entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date);
+        entry.get().then((e) => {
+            if (e.exists) {
+                lat = e.data().latitude;
+                console.log(lat)
+                long = e.data().longitude;
+                if (lat != undefined) {
+                    loc = {
+                        location: {
+                            latitude: lat,
+                            longitude: long,
+                        },
+                        mapRegion: {
+                            latitude: lat,
+                            longitude: long,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421
+                        }
+                    }
+                    return loc;
+                }
+            }
+            return "";
+        })
+    }
+
+    getCurrentLocation = async () => {
+        let { status } = await Permissions.askAsync(Permissions.LOCATION);
+        if (status !== 'granted') {
+            this.setState({
+                errorMessage: 'Permission to access location was denied',
+            });
+        }
+        console.log("hi")
+        let location = await Location.getCurrentPositionAsync({});
+        uid = Firebase.auth().currentUser.uid;
+        entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
+        entry.get().then((e) => {
+            if (e.exists) {
+                entry.update({
+                    latitude: "" + location.coords.latitude,
+                    longitude: "" + location.coords.longitude,
+                })
+            }
+            else {
+                entry.set({
+                    latitude: "" + location.coords.latitude,
+                    longitude: "" + location.coords.longitude,
+                })
+            }
+        })
+        this.setState({
+            location: {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+            },
+            mapRegion: {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421
+            },
+            mapVisible: true
+
+        })
     }
     onFocusFunction = () => {
         if (this.props.navigation.state.params != undefined) {
@@ -139,6 +254,7 @@ class JournalScreen extends React.Component {
 
         this.insertImage(result.uri);
     };
+
 
     onImageSelectorClicked = (value) => {
         if (value == 1) {
@@ -381,9 +497,40 @@ class JournalScreen extends React.Component {
                         </View>
 
                         {(this.state.keyboardOpen == false) ?
-                            <TouchableOpacity onPress={this.addToFirebase}>
-                                <Ionicons name="ios-add-circle-outline" color="#cbbade" size={55} />
-                            </TouchableOpacity> :
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity onPress={this.addToFirebase}>
+                                    <Ionicons name="ios-add-circle-outline" color="#cbbade" size={55} />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => this.openMap()} style={styles.locationButton}>
+                                    <EvilIcons name="location" color="#cbbade" size={55} />
+                                </TouchableOpacity>
+                                <View>
+                                    <Modal
+                                        visible={this.state.mapVisible}
+                                        animationType={'slide'}
+                                        onRequestClose={() => this.closeMap()}
+                                    >
+                                        <View style={styles.modalContainer}>
+                                            <MapView
+                                                style={styles.mapStyle}
+                                                region={this.state.mapRegion != "" ? this.state.mapRegion : null}
+                                            >
+                                                {(this.state.location != "") ? <MapView.Marker
+                                                    coordinate={this.state.location != "" ? this.state.location : null}
+                                                    title={"Entry Location"}
+                                                /> : <br />}
+                                            </MapView>
+                                            <Button
+                                                onPress={() => this.closeMap()}
+                                                title="Close Map"
+                                                style={styles.mapButton}
+                                                color="#3e3e3e"
+                                            >
+                                            </Button>
+                                        </View>
+                                    </Modal>
+                                </View>
+                            </View> :
 
                             <View style={styles.toolbarContainer}>
                                 <CNToolbar
@@ -502,6 +649,25 @@ let styles = StyleSheet.create({
         paddingTop: Constants.statusBarHeight,
         alignItems: "center",
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    locationButton: {
+        flex: 1,
+        marginTop: 5,
+        alignItems: 'flex-end',
+    },
+    mapButton: {
+        flex: 1,
+    },
+    mapStyle: {
+        justifyContent: 'center',
+        alignSelf: 'flex-end',
+        width: '100%',
+        height: '90%',
+        backgroundColor: 'rgba(255,255,255,0.4)',
+    },
     title: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -553,7 +719,19 @@ let styles = StyleSheet.create({
         marginHorizontal: 0,
         borderBottomWidth: 1,
         borderColor: '#eee'
-    }
+    },
+    modalContainer: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
+    innerContainer: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+    },
 })
 
 const optionsStyles = {
