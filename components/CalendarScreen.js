@@ -1,6 +1,6 @@
 import React from 'react'
 import Firebase from '../Firebase'
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import Constants from "expo-constants";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -42,9 +42,7 @@ class CalendarScreen extends React.Component {
                 });
             }
         })
-        this.setState({
-            selected: date,
-        })
+        
     }
 
     componentDidMount =()=> {
@@ -93,16 +91,13 @@ class CalendarScreen extends React.Component {
     };
 
     onUpdateSelectedDate = date => {
-        const item = this.state.olderEntries[date.dateString];
         this.setState({
-            intialItemsLoad: {item},
             selected: date.dateString
        });
     };
 
     renderItemForAgenda = item => {
         if(item.date === this.state.selected){
-            console.log("I got in bitches!")
             return (
                 <View style={styles.item}>
                     <View style={styles.itemTop}>
@@ -110,12 +105,12 @@ class CalendarScreen extends React.Component {
                             <MaterialCommunityIcons name={item.mood} color="#cbbade" size={55} />
                         </TouchableOpacity>
                         <Text>{item.date}</Text>
-                        <TouchableOpacity>
-                            <MaterialCommunityIcons name='square-edit-outline' color="#cbbade" size={25} />
+                        <TouchableOpacity onPress={()=> this.getEntry(this.state.selected)}>
+                            <MaterialCommunityIcons name='square-edit-outline' color="#cbbade" size={30} />
                         </TouchableOpacity>
 
                     </View>
-                    <View  pointerEvents="none"> 
+                    <View pointerEvents="none"> 
                         <CNRichTextEditor
                             value={JSON.parse(item.text)}
                             foreColor='dimgray' // optional (will override default fore-color)
@@ -132,20 +127,32 @@ class CalendarScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <Text style={styles.calendarText}>Calendar</Text>
-                {console.log(this.state.olderEntries)}
-                <Agenda
+                <Agenda 
                     firstDay={parseInt(
                         moment(new Date())
                         .day()
                         .toString(),
                         10
                     )}
+                    selected = {this.state.selected}
                     items={this.state.olderEntries}
                     renderItem={this.renderItemForAgenda}
                     renderDay={(day, item) => {return (<View />);}}
                     onDayPress={this.onUpdateSelectedDate}
                     markedDates = {this.getMarkedDates()}
-                    renderEmptyData={() => <View style={{ flex: 1, flexDirection:'column',justifyContent: 'center', alignItems: 'center' }}><Text>No saved entry</Text></View>}
+                    renderEmptyData={() => {
+                        return(
+                            <View style={{ flex: 1, flexDirection:'column',justifyContent: 'center', alignItems: 'center' }}>
+
+                                <TouchableOpacity 
+                                    style= {{borderRadius: 5, borderWidth:1, borderColor:"#cbbade", backgroundColor: "#cbbade", padding:3, fontFamily: 'AppleSDGothicNeo-Light', marginBottom: 10}}
+                                    onPress={()=> this.getEntry(this.state.selected)}>
+                                    <Text style={{fontFamily: 'AppleSDGothicNeo-Light'}}>Add Entry</Text>
+                                </TouchableOpacity>
+                                <Text>No saved entry</Text>
+                            </View>
+                        )  
+                    }}
                     rowHasChanged={(r1, r2) => r1.date !== r2.date}
                     theme={{
                         agendaDayNumColor: '#CBBADE',
