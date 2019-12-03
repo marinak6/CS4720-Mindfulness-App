@@ -42,62 +42,71 @@ class CalendarScreen extends React.Component {
                 });
             }
         })
-        
+
     }
 
-    componentDidMount =()=> {
+    componentDidMount = () => {
+        this.focusListener = this.props.navigation.addListener('didFocus', () => {
+            this.onFocusFunction()
+        })
+    }
+
+    onFocusFunction = () => {
+        setTimeout(this.getFirebase, 500)
+    }
+    getFirebase = () => {
         uid = Firebase.auth().currentUser.uid;
         datesRef = Firebase.firestore().collection('users').doc("" + uid).collection('dates')
         let datesObj = {}
-        datesRef.get().then((querySnapshot)=> {
-            querySnapshot.forEach(function(doc) { 
-                datesObj[""+doc.id] = [{
+        datesRef.get().then((querySnapshot) => {
+            querySnapshot.forEach(function (doc) {
+                datesObj["" + doc.id] = [{
                     date: doc.data().date,
                     text: doc.data().text
-                }]         
+                }]
+                console.log(doc.data().text)
             });
             this.setState({
                 olderEntries: datesObj,
                 intialItemsLoad: datesObj
             })
         })
-        .catch(function(error) {
-            console.log("Error getting documents: ", error);
-        }); 
-      }
-
+            .catch(function (error) {
+                console.log("Error getting documents: ", error);
+            });
+    }
     getMarkedDates = () => {
         let markedDates = {};
-        if(this.state.olderEntries!==undefined){
+        if (this.state.olderEntries !== undefined) {
             Object.keys(this.state.olderEntries).map(date => {
                 let moodColor = 'blue'
-                if(date.mood === 'sad')
+                if (date.mood === 'sad')
                     moodColor = 'red'
-                else if(date.mood === 'neutral')
+                else if (date.mood === 'neutral')
                     moodColor = 'yellow'
-                else if(date.mood === 'happy')
+                else if (date.mood === 'happy')
                     moodColor = 'green'
-                else{ moodColor = 'blue'}
+                else { moodColor = 'blue' }
                 markedDates[date] = {
                     marked: true,
                     dotColor: moodColor
-              };
+                };
             });
         }
-        
-    
+
+
         return markedDates
-        
+
     };
 
     onUpdateSelectedDate = date => {
         this.setState({
             selected: date.dateString
-       });
+        });
     };
 
     renderItemForAgenda = item => {
-        if(item.date === this.state.selected){
+        if (item.date === this.state.selected) {
             return (
                 <View style={styles.item}>
                     <View style={styles.itemTop}>
@@ -105,16 +114,16 @@ class CalendarScreen extends React.Component {
                             <MaterialCommunityIcons name={item.mood} color="#cbbade" size={55} />
                         </TouchableOpacity>
                         <Text>{item.date}</Text>
-                        <TouchableOpacity onPress={()=> this.getEntry(this.state.selected)}>
+                        <TouchableOpacity onPress={() => this.getEntry(this.state.selected)}>
                             <MaterialCommunityIcons name='square-edit-outline' color="#cbbade" size={30} />
                         </TouchableOpacity>
 
                     </View>
-                    <View pointerEvents="none"> 
+                    <View pointerEvents="none">
                         <CNRichTextEditor
                             value={JSON.parse(item.text)}
                             foreColor='dimgray' // optional (will override default fore-color)
-                            onValueChanged={()=>{ }}
+                            onValueChanged={() => { }}
                             styleList={this.customStyles}
                         />
                     </View>
@@ -127,31 +136,31 @@ class CalendarScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <Text style={styles.calendarText}>Calendar</Text>
-                <Agenda 
+                <Agenda
                     firstDay={parseInt(
                         moment(new Date())
-                        .day()
-                        .toString(),
+                            .day()
+                            .toString(),
                         10
                     )}
-                    selected = {this.state.selected}
+                    selected={this.state.selected}
                     items={this.state.olderEntries}
                     renderItem={this.renderItemForAgenda}
-                    renderDay={(day, item) => {return (<View />);}}
+                    renderDay={(day, item) => { return (<View />); }}
                     onDayPress={this.onUpdateSelectedDate}
-                    markedDates = {this.getMarkedDates()}
+                    markedDates={this.getMarkedDates()}
                     renderEmptyData={() => {
-                        return(
-                            <View style={{ flex: 1, flexDirection:'column',justifyContent: 'center', alignItems: 'center' }}>
+                        return (
+                            <View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
 
-                                <TouchableOpacity 
-                                    style= {{borderRadius: 5, borderWidth:1, borderColor:"#cbbade", backgroundColor: "#cbbade", padding:3, fontFamily: 'AppleSDGothicNeo-Light', marginBottom: 10}}
-                                    onPress={()=> this.getEntry(this.state.selected)}>
-                                    <Text style={{fontFamily: 'AppleSDGothicNeo-Light'}}>Add Entry</Text>
+                                <TouchableOpacity
+                                    style={{ borderRadius: 5, borderWidth: 1, borderColor: "#cbbade", backgroundColor: "#cbbade", padding: 3, fontFamily: 'AppleSDGothicNeo-Light', marginBottom: 10 }}
+                                    onPress={() => this.getEntry(this.state.selected)}>
+                                    <Text style={{ fontFamily: 'AppleSDGothicNeo-Light' }}>Add Entry</Text>
                                 </TouchableOpacity>
                                 <Text>No saved entry</Text>
                             </View>
-                        )  
+                        )
                     }}
                     rowHasChanged={(r1, r2) => r1.date !== r2.date}
                     theme={{
@@ -163,7 +172,7 @@ class CalendarScreen extends React.Component {
                         todayTextColor: '#CBBADE',
                         selectedDayBackgroundColor: '#CBBADE',
                         'stylesheet.calendar.header': {
-                        week: { marginTop: 0, flexDirection: 'row', justifyContent: 'space-between' }
+                            week: { marginTop: 0, flexDirection: 'row', justifyContent: 'space-between' }
                         }
                     }}
                 />
@@ -201,7 +210,7 @@ const styles = StyleSheet.create({
         marginTop: 17,
         fontSize: 5,
     },
-    itemTop:{
+    itemTop: {
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
