@@ -43,7 +43,6 @@ class HomeScreen extends React.Component {
     async getQuote() {
         let response = await fetch("http://quotes.rest/qod.json?category=inspire")
         let parseObject = await response.json()
-        console.log(parseObject)
         this.setState({
             quote: parseObject.contents.quotes[0].quote
         })

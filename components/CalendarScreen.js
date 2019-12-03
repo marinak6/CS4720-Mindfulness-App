@@ -1,16 +1,25 @@
 import React from 'react'
 import Firebase from '../Firebase'
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 import Constants from "expo-constants";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import moment from "moment";
+import { thisExpression } from '@babel/types';
+import CNRichTextEditor, { getDefaultStyles, convertToObject, getInitialObject } from "react-native-cn-richtext-editor";
 
+const defaultStyles = getDefaultStyles();
 
 class CalendarScreen extends React.Component {
     constructor(props) {
         super(props);
+        this.customStyles = {
+            ...defaultStyles, body: { fontSize: 16 }, heading: { fontSize: 16 }
+            , title: { fontSize: 20 }, ol: { fontSize: 16 }, ul: { fontSize: 16 }, bold: { fontSize: 16, fontWeight: 'bold', color: 'black' }
+        };
         this.state = {
-            selected: moment().format('YYYY-MM-DD')
+            selected: moment().format('YYYY-MM-DD') //initially selected date should be today
         }
         this.getEntry.bind(this)
     }
@@ -33,66 +42,129 @@ class CalendarScreen extends React.Component {
                 });
             }
         })
-        this.setState({
-            selected: date,
-        })
+        
     }
+
+    componentDidMount =()=> {
+        uid = Firebase.auth().currentUser.uid;
+        datesRef = Firebase.firestore().collection('users').doc("" + uid).collection('dates')
+        let datesObj = {}
+        datesRef.get().then((querySnapshot)=> {
+            querySnapshot.forEach(function(doc) { 
+                datesObj[""+doc.id] = [{
+                    date: doc.data().date,
+                    text: doc.data().text
+                }]         
+            });
+            this.setState({
+                olderEntries: datesObj,
+                intialItemsLoad: datesObj
+            })
+        })
+        .catch(function(error) {
+            console.log("Error getting documents: ", error);
+        }); 
+      }
+
+    getMarkedDates = () => {
+        let markedDates = {};
+        if(this.state.olderEntries!==undefined){
+            Object.keys(this.state.olderEntries).map(date => {
+                let moodColor = 'blue'
+                if(date.mood === 'sad')
+                    moodColor = 'red'
+                else if(date.mood === 'neutral')
+                    moodColor = 'yellow'
+                else if(date.mood === 'happy')
+                    moodColor = 'green'
+                else{ moodColor = 'blue'}
+                markedDates[date] = {
+                    marked: true,
+                    dotColor: moodColor
+              };
+            });
+        }
+        
+    
+        return markedDates
+        
+    };
+
+    onUpdateSelectedDate = date => {
+        this.setState({
+            selected: date.dateString
+       });
+    };
+
+    renderItemForAgenda = item => {
+        if(item.date === this.state.selected){
+            return (
+                <View style={styles.item}>
+                    <View style={styles.itemTop}>
+                        <TouchableOpacity>
+                            <MaterialCommunityIcons name={item.mood} color="#cbbade" size={55} />
+                        </TouchableOpacity>
+                        <Text>{item.date}</Text>
+                        <TouchableOpacity onPress={()=> this.getEntry(this.state.selected)}>
+                            <MaterialCommunityIcons name='square-edit-outline' color="#cbbade" size={30} />
+                        </TouchableOpacity>
+
+                    </View>
+                    <View pointerEvents="none"> 
+                        <CNRichTextEditor
+                            value={JSON.parse(item.text)}
+                            foreColor='dimgray' // optional (will override default fore-color)
+                            onValueChanged={()=>{ }}
+                            styleList={this.customStyles}
+                        />
+                    </View>
+                </View>
+            );
+        }
+    }
+
     render() {
         return (
             <View style={styles.container}>
                 <Text style={styles.calendarText}>Calendar</Text>
-                <Calendar
-                    current={'2019-11-14'}
-                    markedDates={{ [this.state.selected]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' } }}
+                <Agenda 
+                    firstDay={parseInt(
+                        moment(new Date())
+                        .day()
+                        .toString(),
+                        10
+                    )}
+                    selected = {this.state.selected}
+                    items={this.state.olderEntries}
+                    renderItem={this.renderItemForAgenda}
+                    renderDay={(day, item) => {return (<View />);}}
+                    onDayPress={this.onUpdateSelectedDate}
+                    markedDates = {this.getMarkedDates()}
+                    renderEmptyData={() => {
+                        return(
+                            <View style={{ flex: 1, flexDirection:'column',justifyContent: 'center', alignItems: 'center' }}>
 
-                    onDayPress={(date) => { this.getEntry(date.dateString) }}
-                    // Handler which gets executed on day long press. Default = undefined
-                    onDayLongPress={(day) => { console.log('selected day', day) }}
-                    // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-                    monthFormat={'MMM yyyy'}
-                    // Handler which gets executed when visible month changes in calendar. Default = undefined
-                    onMonthChange={(month) => { console.log('month changed', month) }}
-
-                    // Do not show days of other months in month page. Default = false
-                    hideExtraDays={true}
-                    // If hideArrows=false and hideExtraDays=false do not switch month when tapping on greyed out
-                    // day from another month that is visible in calendar page. Default = false
-                    disableMonthChange={true}
-                    // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
-                    firstDay={1}
-                    // Hide day names. Default = false
-                    hideDayNames={true}
-
-                    // Handler which gets executed when press arrow icon left. It receive a callback can go back month
-                    onPressArrowLeft={substractMonth => substractMonth()}
-                    // Handler which gets executed when press arrow icon left. It receive a callback can go next month
-                    onPressArrowRight={addMonth => addMonth()}
-
-                    style={{
-                        borderWidth: 1,
-                        borderColor: 'gray',
-                        width: '85%',
-
+                                <TouchableOpacity 
+                                    style= {{borderRadius: 5, borderWidth:1, borderColor:"#cbbade", backgroundColor: "#cbbade", padding:3, fontFamily: 'AppleSDGothicNeo-Light', marginBottom: 10}}
+                                    onPress={()=> this.getEntry(this.state.selected)}>
+                                    <Text style={{fontFamily: 'AppleSDGothicNeo-Light'}}>Add Entry</Text>
+                                </TouchableOpacity>
+                                <Text>No saved entry</Text>
+                            </View>
+                        )  
                     }}
-                    // Specify theme properties to override specific styles for calendar parts. Default = {}
+                    rowHasChanged={(r1, r2) => r1.date !== r2.date}
                     theme={{
-                        backgroundColor: '#ffffff',
-                        calendarBackground: '#ffffff',
+                        agendaDayNumColor: '#CBBADE',
+                        agendaDayTextColor: '#CBBADE',
+                        agendaKnobColor: '#efefef',
+                        agendaTodayColor: '#CBBADE',
+                        dotColor: '#CBBADE',
+                        todayTextColor: '#CBBADE',
                         selectedDayBackgroundColor: '#CBBADE',
-                        selectedDayTextColor: '#ffffff',
-                        todayTextColor: '#383838',
-                        textDisabledColor: '#d9e1e8',
-                        arrowColor: '#CBBADE',
-                        dotColor: '#00adf5',
-                        selectedDotColor: '#ffffff',
-                        textDayFontWeight: '300',
-                        textMonthFontWeight: 'bold',
-                        textDayHeaderFontWeight: '300',
-                        textDayFontSize: 16,
-                        textMonthFontSize: 16,
-                        monthTextColor: '#383838',
-                        dayTextColor: '#383838',
-                        textDayHeaderFontSize: 16
+                        'stylesheet.calendar.header': {
+                        week: { marginTop: 0, flexDirection: 'row', justifyContent: 'space-between' }
+                        }
                     }}
                 />
             </View>
@@ -107,10 +179,10 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        height: "100%",
-        width: "100%",
-        justifyContent: 'center',
-        alignItems: 'center',
+        // height: "100%",
+        // width: "100%",
+        // justifyContent: 'center',
+        // alignItems: 'center',
         backgroundColor: 'white',
     },
     calendarText: {
@@ -120,5 +192,24 @@ const styles = StyleSheet.create({
         fontSize: 35,
         color: '#383838'
     },
+    item: {
+        backgroundColor: 'white',
+        flex: 1,
+        borderRadius: 5,
+        padding: 10,
+        marginRight: 10,
+        marginTop: 17,
+        fontSize: 5,
+    },
+    itemTop:{
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        fontSize: 18,
+        borderBottomWidth: 0.5,
+        borderColor: '#70757A',
+
+    }
+
 
 });
