@@ -185,8 +185,9 @@ class JournalScreen extends React.Component {
                     }
                     // somehow v is undefined here
                     this.setState({
-                        value: v,
+                        value: JSON.parse(v),
                     })
+                    console.log("state" + this.state.value)
                 }
             })
         }
