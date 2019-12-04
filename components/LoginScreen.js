@@ -1,11 +1,12 @@
 import React from 'react'
-import { View, TextInput, StyleSheet, TouchableOpacity, Text, Button } from 'react-native'
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, Button, Dimensions } from 'react-native'
 import Firebase from '../Firebase'
+
 
 class LoginScreen extends React.Component {
   state = {
     email: '',
-    password: ''
+    password: '', 
   }
 
   handleLogin = () => {
@@ -52,7 +53,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -100
+    marginTop: -30
   },
   welcomeTitle: {
     fontFamily: 'BodoniSvtyTwoITCTT-Bold',
