@@ -57,12 +57,14 @@ class JournalScreen extends React.Component {
                 entry.update({
                     date: "" + this.state.date,
                     text: JSON.stringify(this.state.value),
+                    mood: this.state.mood
                 })
             }
             else {
                 entry.set({
                     date: "" + this.state.date,
                     text: JSON.stringify(this.state.value),
+                    mood: this.state.mood
                 })
             }
         })
@@ -104,7 +106,6 @@ class JournalScreen extends React.Component {
         entry.get().then((e) => {
             if (e.exists) {
                 lat = e.data().latitude;
-                console.log(lat)
                 long = e.data().longitude;
                 if (lat != undefined) {
                     loc = {
@@ -133,7 +134,6 @@ class JournalScreen extends React.Component {
                 errorMessage: 'Permission to access location was denied',
             });
         }
-        console.log("hi")
         let location = await Location.getCurrentPositionAsync({});
         uid = Firebase.auth().currentUser.uid;
         entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
@@ -168,35 +168,107 @@ class JournalScreen extends React.Component {
     }
     onFocusFunction = () => {
         v = undefined;
-        if (this.props.navigation.state.params == undefined) {
+        console.log(this.props.navigation.state.params)
+        if (this.props.navigation.state.params.text==="") { //when creating a new entry for a empty date in the calendar
+            console.log('in this first condioton')
             uid = Firebase.auth().currentUser.uid;
-            console.log(this.state.date)
-            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
+            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.props.navigation.state.params.date)
             entry.get().then((e) => {
                 if (e.exists) {
                     v = e.data().text
                     // gets the text from firebase
-                    console.log(v)
 
                     // if there is no text in firebase
                     if (v == undefined) {
-                        console.log("hi")
                         v = [getInitialObject()];
                     }
                     // somehow v is undefined here
                     this.setState({
                         value: JSON.parse(v),
+                        date: this.props.navigation.state.params.date
                     })
-                    console.log("state" + this.state.value)
                 }
             })
         }
+        else if(this.props.navigation.state.params.mood &&  this.props.navigation.state.params.text===undefined){
+            console.log('in this second condioton')
+            uid = Firebase.auth().currentUser.uid;
+            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
+            entry.get().then((e) => {
+                if (e.exists) {
+                    v = e.data().text
+                    // gets the text from firebase
+
+                    // if there is no text in firebase
+                    if (v == undefined) {
+                        v = [getInitialObject()];
+                    }
+                    // somehow v is undefined here
+
+                    var sadColor = '#cbbade'
+                    var neutralColor = '#cbbade'
+                    var happyColor = "#cbbade"
+                    
+                    if(this.props.navigation.state.params.mood  === 'emoticon-sad'){
+                        sadColor = '#bacdde'
+                        neutralColor = '#cbbade'
+                        happyColor = "#cbbade" 
+                    }
+                    if(this.props.navigation.state.params.mood  === 'emoticon-neutral'){
+                        sadColor = '#cbbade'
+                        neutralColor = '#decbba'
+                        happyColor = "#cbbade" 
+                    }
+                    if(this.props.navigation.state.params.mood  === 'emoticon-happy'){
+                        sadColor = '#cbbade'
+                        neutralColor = '#cbbade'
+                        happyColor = "#BBDEBA" 
+                    }
+
+                    this.setState({
+                        value: JSON.parse(v),
+                        mood: this.props.navigation.state.params.mood,
+                        date: this.props.navigation.state.params.date,
+                        sadColor: sadColor,
+                        neutralColor: neutralColor,
+                        happyColor: happyColor,
+                    })
+                }
+            })
+
+        }
         else {
+            console.log('in this last condioton')
+            var sadColor = '#cbbade'
+            var neutralColor = '#cbbade'
+            var happyColor = "#cbbade"
+            
+            if(this.props.navigation.state.params.mood  === 'emoticon-sad'){
+                sadColor = '#bacdde'
+                neutralColor = '#cbbade'
+                happyColor = "#cbbade" 
+            }
+            if(this.props.navigation.state.params.mood  === 'emoticon-neutral'){
+                sadColor = '#cbbade'
+                neutralColor = '#decbba'
+                happyColor = "#cbbade" 
+            }
+            if(this.props.navigation.state.params.mood  === 'emoticon-happy'){
+                sadColor = '#cbbade'
+                neutralColor = '#cbbade'
+                happyColor = "#BBDEBA" 
+            }
+
             v = JSON.parse(this.props.navigation.state.params.text);
             this.setState({
                 value: v,
-                date: this.props.navigation.state.params.date
+                date: this.props.navigation.state.params.date, 
+                mood: this.props.navigation.state.params.mood,
+                sadColor: sadColor,
+                neutralColor: neutralColor,
+                happyColor: happyColor,
             })
+
         }
     }
     componentDidMount() {
@@ -472,6 +544,37 @@ class JournalScreen extends React.Component {
         );
     }
 
+    setMood = (mood)=>{
+        let sadColor = '#cbbade'
+        let neutralColor = '#cbbade'
+        let happyColor = "#cbbade"
+        
+        if(mood  === 'emoticon-sad'){
+            sadColor = '#bacdde'
+            neutralColor = '#cbbade'
+            happyColor = "#cbbade" 
+        }
+        if(mood  === 'emoticon-neutral'){
+            sadColor = '#cbbade'
+            neutralColor = '#decbba'
+            happyColor = "#cbbade" 
+        }
+        if(mood  === 'emoticon-happy'){
+            sadColor = '#cbbade'
+            neutralColor = '#cbbade'
+            happyColor = "#BBDEBA" 
+        }
+
+        this.setState({
+            value: JSON.parse(v),
+            mood: mood,
+            sadColor: sadColor,
+            neutralColor: neutralColor,
+            happyColor: happyColor,
+        })
+
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -485,14 +588,15 @@ class JournalScreen extends React.Component {
                         <Text style={styles.date}>{this.state.date}</Text>
                     </View>
                     <View style={styles.moodIcons}>
-                        <TouchableOpacity style={{ marginRight: 10 }}>
-                            <MaterialCommunityIcons name="emoticon-sad" color="#cbbade" size={35} />
+                    
+                        <TouchableOpacity  onPress= {()=>this.setMood('emoticon-sad')} style={{ marginRight: 10 }}>
+                            <MaterialCommunityIcons name="emoticon-sad" color={this.state.sadColor} size={35} />
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ marginRight: 10 }}>
-                            <MaterialCommunityIcons name="emoticon-neutral" color="#cbbade" size={35} />
+                        <TouchableOpacity onPress= {()=>this.setMood('emoticon-neutral')} style={{ marginRight: 10 }}>
+                            <MaterialCommunityIcons name="emoticon-neutral" color={this.state.neutralColor} size={35} />
                         </TouchableOpacity>
-                        <TouchableOpacity>
-                            <MaterialCommunityIcons name="emoticon-happy" color="#cbbade" size={35} />
+                        <TouchableOpacity onPress= {()=>this.setMood('emoticon-happy')}>
+                            <MaterialCommunityIcons name="emoticon-happy" color={this.state.happyColor} size={35} />
                         </TouchableOpacity>
                         {(this.state.keyboardOpen == true) ? <Button onPress={Keyboard.dismiss} title="Done" color="#cbbade" /> : <View />}
                     </View>

@@ -64,14 +64,14 @@ class HomeScreen extends React.Component {
                 <View style={styles.container}>
                     <Text style={styles.feelingText}> How Are You Today?</Text>
                     <View style={styles.moodIcons}>
-                        <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal',{mood:"emoticon-sad"})} style={styles.mood}>
                             <MaterialCommunityIcons name="emoticon-sad" color="#bacdde" size={55} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => this.getEntry()} style={styles.mood}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal',{mood:"emoticon-neutral"})} style={styles.mood}>
                             <MaterialCommunityIcons name="emoticon-neutral" color="#decbba" size={55} />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal')} style={styles.mood}>
-                            <MaterialCommunityIcons name="emoticon-happy" color="#cbbade" size={55} />
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Journal',{mood:"emoticon-happy"})} style={styles.mood}>
+                            <MaterialCommunityIcons name="emoticon-happy" color="#BBDEBA" size={55} />
                         </TouchableOpacity>
                     </View>
 
