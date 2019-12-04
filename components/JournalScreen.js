@@ -207,48 +207,38 @@ class JournalScreen extends React.Component {
         }
         else if(this.props.navigation.state.params.mood &&  this.props.navigation.state.params.text===undefined){ //when clicking on mood in homescreen and navigate to journal
             console.log('in this second condioton')
-            uid = Firebase.auth().currentUser.uid;
-            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
-            entry.get().then((e) => {
-                if (e.exists) {
-                    v = e.data().text
-                    // gets the text from firebase
+            
+            if (v == undefined) {
+                v = [getInitialObject()];
+            }
+            var sadColor = '#cbbade'
+            var neutralColor = '#cbbade'
+            var happyColor = "#cbbade"
+            
+            console.log(this.props.navigation.state.params.mood)
+            if(this.props.navigation.state.params.mood  === 'emoticon-sad'){
+                sadColor = '#bacdde'
+                neutralColor = '#cbbade'
+                happyColor = "#cbbade" 
+            }
+            if(this.props.navigation.state.params.mood  === 'emoticon-neutral'){
+                sadColor = '#cbbade'
+                neutralColor = '#decbba'
+                happyColor = "#cbbade" 
+            }
+            if(this.props.navigation.state.params.mood  === 'emoticon-happy'){
+                sadColor = '#cbbade'
+                neutralColor = '#cbbade'
+                happyColor = "#BBDEBA" 
+            }
 
-                    // if there is no text in firebase
-                    if (v == undefined) {
-                        v = [getInitialObject()];
-                    }
-                    // somehow v is undefined here
-
-                    var sadColor = '#cbbade'
-                    var neutralColor = '#cbbade'
-                    var happyColor = "#cbbade"
-                    
-                    if(this.props.navigation.state.params.mood  === 'emoticon-sad'){
-                        sadColor = '#bacdde'
-                        neutralColor = '#cbbade'
-                        happyColor = "#cbbade" 
-                    }
-                    if(this.props.navigation.state.params.mood  === 'emoticon-neutral'){
-                        sadColor = '#cbbade'
-                        neutralColor = '#decbba'
-                        happyColor = "#cbbade" 
-                    }
-                    if(this.props.navigation.state.params.mood  === 'emoticon-happy'){
-                        sadColor = '#cbbade'
-                        neutralColor = '#cbbade'
-                        happyColor = "#BBDEBA" 
-                    }
-
-                    this.setState({
-                        value: JSON.parse(v),
-                        mood: this.props.navigation.state.params.mood,
-                        date: this.state.date,
-                        sadColor: sadColor,
-                        neutralColor: neutralColor,
-                        happyColor: happyColor,
-                    })
-                }
+            this.setState({
+                value: v,
+                mood: this.props.navigation.state.params.mood,
+                date: this.state.date,
+                sadColor: sadColor,
+                neutralColor: neutralColor,
+                happyColor: happyColor,
             })
 
         }
