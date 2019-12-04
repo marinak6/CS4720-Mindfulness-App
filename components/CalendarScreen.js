@@ -1,6 +1,6 @@
 import React from 'react'
 import Firebase from '../Firebase'
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions } from 'react-native';
 import Constants from "expo-constants";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -8,6 +8,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import moment from "moment";
 import { thisExpression } from '@babel/types';
 import CNRichTextEditor, { getDefaultStyles, convertToObject, getInitialObject } from "react-native-cn-richtext-editor";
+
+const { width, height } = Dimensions.get('window');
 
 const defaultStyles = getDefaultStyles();
 
@@ -192,12 +194,14 @@ const styles = StyleSheet.create({
         // width: "100%",
         // justifyContent: 'center',
         // alignItems: 'center',
+        paddingTop: Constants.statusBarHeight,
         backgroundColor: 'white',
     },
     calendarText: {
         //marginTop: '-25%',
         fontFamily: 'BodoniSvtyTwoITCTT-Bold',
         margin: 10,
+        paddingLeft: 20,
         fontSize: 35,
         color: '#383838'
     },
