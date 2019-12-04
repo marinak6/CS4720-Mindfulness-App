@@ -94,6 +94,7 @@ class JournalScreen extends React.Component {
                 // need to push this to firebase and render map
             }
             else {
+                console.log(loc.location)
                 this.setState({
                     location: loc.location,
                     mapRegion: {
@@ -207,48 +208,38 @@ class JournalScreen extends React.Component {
         }
         else if(this.props.navigation.state.params.mood &&  this.props.navigation.state.params.text===undefined){ //when clicking on mood in homescreen and navigate to journal
             console.log('in this second condioton')
-            uid = Firebase.auth().currentUser.uid;
-            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
-            entry.get().then((e) => {
-                if (e.exists) {
-                    v = e.data().text
-                    // gets the text from firebase
+            
+            if (v == undefined) {
+                v = [getInitialObject()];
+            }
+            var sadColor = '#cbbade'
+            var neutralColor = '#cbbade'
+            var happyColor = "#cbbade"
+            
+            console.log(this.props.navigation.state.params.mood)
+            if(this.props.navigation.state.params.mood  === 'emoticon-sad'){
+                sadColor = '#bacdde'
+                neutralColor = '#cbbade'
+                happyColor = "#cbbade" 
+            }
+            if(this.props.navigation.state.params.mood  === 'emoticon-neutral'){
+                sadColor = '#cbbade'
+                neutralColor = '#decbba'
+                happyColor = "#cbbade" 
+            }
+            if(this.props.navigation.state.params.mood  === 'emoticon-happy'){
+                sadColor = '#cbbade'
+                neutralColor = '#cbbade'
+                happyColor = "#BBDEBA" 
+            }
 
-                    // if there is no text in firebase
-                    if (v == undefined) {
-                        v = [getInitialObject()];
-                    }
-                    // somehow v is undefined here
-
-                    var sadColor = '#cbbade'
-                    var neutralColor = '#cbbade'
-                    var happyColor = "#cbbade"
-                    
-                    if(this.props.navigation.state.params.mood  === 'emoticon-sad'){
-                        sadColor = '#bacdde'
-                        neutralColor = '#cbbade'
-                        happyColor = "#cbbade" 
-                    }
-                    if(this.props.navigation.state.params.mood  === 'emoticon-neutral'){
-                        sadColor = '#cbbade'
-                        neutralColor = '#decbba'
-                        happyColor = "#cbbade" 
-                    }
-                    if(this.props.navigation.state.params.mood  === 'emoticon-happy'){
-                        sadColor = '#cbbade'
-                        neutralColor = '#cbbade'
-                        happyColor = "#BBDEBA" 
-                    }
-
-                    this.setState({
-                        value: JSON.parse(v),
-                        mood: this.props.navigation.state.params.mood,
-                        date: this.state.date,
-                        sadColor: sadColor,
-                        neutralColor: neutralColor,
-                        happyColor: happyColor,
-                    })
-                }
+            this.setState({
+                value: v,
+                mood: this.props.navigation.state.params.mood,
+                date: this.state.date,
+                sadColor: sadColor,
+                neutralColor: neutralColor,
+                happyColor: happyColor,
             })
 
         }
@@ -624,17 +615,6 @@ class JournalScreen extends React.Component {
                     </View>
                 </View>
 
-                {/* <TextInput 
-                    multiline 
-                    autogrow 
-                    scrollEnabled
-                    placeholder="How was your day?"
-                    placeholderTextColor = "#70757A" 
-                    style={styles.entry}
-                    onChangeText = {text => this.setState({entry: text})}
-                    value = {this.state.entry}
-                /> */}
-
                 <KeyboardAvoidingView
                     behavior="padding"
                     enabled
@@ -668,36 +648,41 @@ class JournalScreen extends React.Component {
                                 <TouchableOpacity onPress={this.addToFirebase}>
                                     <Ionicons name="ios-add-circle-outline" color="#cbbade" size={55} />
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.openMap()} style={styles.locationButton}>
-                                    <EvilIcons name="location" color="#cbbade" size={55} />
-                                </TouchableOpacity>
-                                <View>
-                                    <Modal
-                                        visible={this.state.mapVisible}
-                                        animationType={'slide'}
-                                        onRequestClose={() => this.closeMap()}
-                                    >
-                                        <View style={styles.modalContainer}>
-                                            <MapView
-                                                style={styles.mapStyle}
-                                                region={this.state.mapRegion != "" ? this.state.mapRegion : null}
-                                            >
-                                                {(this.state.location != "") ? <MapView.Marker
-                                                    coordinate={this.state.location != "" ? this.state.location : null}
-                                                    title={"Entry Location"}
-                                                /> : <br />}
-                                            </MapView>
-                                            <Button
-                                                onPress={() => this.closeMap()}
-                                                title="Close Map"
-                                                style={styles.mapButton}
-                                                color="#3e3e3e"
-                                            >
-                                            </Button>
-                                        </View>
-                                    </Modal>
+                                <View style={styles.locationButton}>
+                                    <TouchableOpacity onPress={() => this.openMap()} >
+                                        <EvilIcons name="location" color="#cbbade" size={55} />
+                                    </TouchableOpacity>
+                                    <View>
+                                        <Modal
+                                            visible={this.state.mapVisible}
+                                            animationType={'slide'}
+                                            onRequestClose={() => this.closeMap()}
+                                        >
+                                            <View style={styles.modalContainer}>
+                                                <MapView
+                                                    style={styles.mapStyle}
+                                                    region={this.state.mapRegion != "" ? this.state.mapRegion : null}
+                                                >
+                                                    {(this.state.location != "") ? <MapView.Marker
+                                                        coordinate={this.state.location != "" ? this.state.location : null}
+                                                        title={"Entry Location"}
+                                                    /> : <br />}
+                                                </MapView>
+                                                <Button
+                                                    onPress={() => this.closeMap()}
+                                                    title="Close Map"
+                                                    style={styles.mapButton}
+                                                    color="#3e3e3e"
+                                                >
+                                                </Button>
+                                            </View>
+                                        </Modal>
+                                    </View>
                                 </View>
-                            </View> :
+                            </View> 
+                            
+                            
+                            :
 
                             <View style={styles.toolbarContainer}>
                                 <CNToolbar
@@ -819,11 +804,14 @@ let styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
+        width: '100%'
     },
     locationButton: {
         flex: 1,
         marginTop: 5,
-        alignItems: 'flex-end',
+        position: 'absolute',
+        right: 0,
+        width: 55
     },
     mapButton: {
         flex: 1,
