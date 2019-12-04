@@ -614,17 +614,6 @@ class JournalScreen extends React.Component {
                     </View>
                 </View>
 
-                {/* <TextInput 
-                    multiline 
-                    autogrow 
-                    scrollEnabled
-                    placeholder="How was your day?"
-                    placeholderTextColor = "#70757A" 
-                    style={styles.entry}
-                    onChangeText = {text => this.setState({entry: text})}
-                    value = {this.state.entry}
-                /> */}
-
                 <KeyboardAvoidingView
                     behavior="padding"
                     enabled
@@ -658,36 +647,41 @@ class JournalScreen extends React.Component {
                                 <TouchableOpacity onPress={this.addToFirebase}>
                                     <Ionicons name="ios-add-circle-outline" color="#cbbade" size={55} />
                                 </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.openMap()} style={styles.locationButton}>
-                                    <EvilIcons name="location" color="#cbbade" size={55} />
-                                </TouchableOpacity>
-                                <View>
-                                    <Modal
-                                        visible={this.state.mapVisible}
-                                        animationType={'slide'}
-                                        onRequestClose={() => this.closeMap()}
-                                    >
-                                        <View style={styles.modalContainer}>
-                                            <MapView
-                                                style={styles.mapStyle}
-                                                region={this.state.mapRegion != "" ? this.state.mapRegion : null}
-                                            >
-                                                {(this.state.location != "") ? <MapView.Marker
-                                                    coordinate={this.state.location != "" ? this.state.location : null}
-                                                    title={"Entry Location"}
-                                                /> : <br />}
-                                            </MapView>
-                                            <Button
-                                                onPress={() => this.closeMap()}
-                                                title="Close Map"
-                                                style={styles.mapButton}
-                                                color="#3e3e3e"
-                                            >
-                                            </Button>
-                                        </View>
-                                    </Modal>
+                                <View style={styles.locationButton}>
+                                    <TouchableOpacity onPress={() => this.openMap()} >
+                                        <EvilIcons name="location" color="#cbbade" size={55} />
+                                    </TouchableOpacity>
+                                    <View>
+                                        <Modal
+                                            visible={this.state.mapVisible}
+                                            animationType={'slide'}
+                                            onRequestClose={() => this.closeMap()}
+                                        >
+                                            <View style={styles.modalContainer}>
+                                                <MapView
+                                                    style={styles.mapStyle}
+                                                    region={this.state.mapRegion != "" ? this.state.mapRegion : null}
+                                                >
+                                                    {(this.state.location != "") ? <MapView.Marker
+                                                        coordinate={this.state.location != "" ? this.state.location : null}
+                                                        title={"Entry Location"}
+                                                    /> : <br />}
+                                                </MapView>
+                                                <Button
+                                                    onPress={() => this.closeMap()}
+                                                    title="Close Map"
+                                                    style={styles.mapButton}
+                                                    color="#3e3e3e"
+                                                >
+                                                </Button>
+                                            </View>
+                                        </Modal>
+                                    </View>
                                 </View>
-                            </View> :
+                            </View> 
+                            
+                            
+                            :
 
                             <View style={styles.toolbarContainer}>
                                 <CNToolbar
@@ -809,11 +803,14 @@ let styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
+        width: '100%'
     },
     locationButton: {
         flex: 1,
         marginTop: 5,
-        alignItems: 'flex-end',
+        position: 'absolute',
+        right: 0,
+        width: 55
     },
     mapButton: {
         flex: 1,
