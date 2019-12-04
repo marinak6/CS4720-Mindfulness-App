@@ -14,8 +14,6 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import uuid from 'uuid';
 
-
-
 const { SlideInMenu } = renderers;
 
 const IS_IOS = Platform.OS === 'ios';
@@ -739,6 +737,8 @@ let styles = StyleSheet.create({
         width: "100%",
         paddingTop: 10,
         paddingBottom: 10,
+        //paddingLeft:Constants.statusBarHeight, 
+        //paddingRight:Constants.statusBarHeight,
         borderColor: '#70757A',
         borderTopWidth: 0.5,
         height: "85%",
