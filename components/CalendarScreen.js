@@ -47,6 +47,7 @@ class CalendarScreen extends React.Component {
 
     }
 
+
     componentDidMount = () => {
         this.focusListener = this.props.navigation.addListener('didFocus', () => {
             this.onFocusFunction()
@@ -210,7 +211,10 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 5,
         padding: 10,
+        //padding: Constants.statusBarHeight,
+        //margin: Constants.statusBarHeight,
         marginRight: 10,
+        marginLeft: 10,
         marginTop: 17,
         fontSize: 5,
     },
