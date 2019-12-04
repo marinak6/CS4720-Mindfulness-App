@@ -1,13 +1,14 @@
 import React from 'react'
 import Firebase from '../Firebase'
-import { View, Text, StyleSheet, Button, Dimensions } from 'react-native';
+import {Modal, View, Text, StyleSheet, Button, Dimensions } from 'react-native';
 import Constants from "expo-constants";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { EvilIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import moment from "moment";
 import { thisExpression } from '@babel/types';
 import CNRichTextEditor, { getDefaultStyles, convertToObject, getInitialObject } from "react-native-cn-richtext-editor";
+import MapView, { Marker } from 'react-native-maps';
 
 const { width, height } = Dimensions.get('window');
 
@@ -72,7 +73,9 @@ class CalendarScreen extends React.Component {
                 datesObj["" + doc.id] = [{
                     date: doc.data().date,
                     text: doc.data().text,
-                    mood: doc.data().mood
+                    mood: doc.data().mood,
+                    latitude: doc.data().latitude,
+                    longitude: doc.data().longitude
                 }]
             });
             this.setState({
@@ -109,8 +112,6 @@ class CalendarScreen extends React.Component {
             });
         }
 
-
-
         return markedDates
 
     };
@@ -121,6 +122,10 @@ class CalendarScreen extends React.Component {
             selected: date.dateString
         });
     };
+
+    openMap = () =>{
+        this.setState({ mapVisible: true })
+    }
 
 
     renderItemForAgenda = item => {
@@ -142,9 +147,56 @@ class CalendarScreen extends React.Component {
                     <View style={styles.itemTop}>
                         <MaterialCommunityIcons name={item.mood} color={color} size={30} />
                         <Text>{item.date}</Text>
-                        <TouchableOpacity onPress={() => this.getEntry(this.state.selected)}>
-                            <MaterialCommunityIcons name='square-edit-outline' color="#cbbade" size={30} />
-                        </TouchableOpacity>
+                        <View style={{flexDirection: 'row'}}>
+                            {item.latitude?
+                            <View>
+                                <TouchableOpacity style={{marginRight:5}} onPress={() => this.openMap()} >
+                                    <EvilIcons name="location" color="#cbbade" size={30} />
+                                </TouchableOpacity>
+                                <View>
+                                    <Modal
+                                        visible={this.state.mapVisible}
+                                        animationType={'slide'}
+                                        onRequestClose={() => his.setState({ mapVisible: false })}
+                                    >
+                                        <View style={styles.modalContainer}>
+                                            <MapView
+                                                style={styles.mapStyle}
+                                                region= {{
+                                                    latitude: parseFloat(item.latitude),
+                                                    longitude: parseFloat(item.longitude),
+                                                    latitudeDelta: 0.0922,
+                                                    longitudeDelta: 0.0421
+                                                }}
+                                            >
+                                                <MapView.Marker
+                                                    coordinate={{
+                                                        latitude: parseFloat(item.latitude),
+                                                        longitude: parseFloat(item.longitude),
+                                                    }}
+                                                    title={"Entry Location"}
+                                                /> 
+                                            </MapView>
+                                            <Button
+                                                onPress={() => this.setState({ mapVisible: false })}
+                                                title="Close Map"
+                                                style={styles.mapButton}
+                                                color="#3e3e3e"
+                                            >
+                                            </Button>
+                                        </View>
+                                    </Modal>
+                                </View>
+                            </View>
+                            :
+                            <View/>}
+
+                            <TouchableOpacity onPress={() => this.getEntry(this.state.selected)}>
+                                <MaterialCommunityIcons name='square-edit-outline' color="#cbbade" size={30} />
+                            </TouchableOpacity>
+
+                        </View>
+                        
 
                     </View>
                     <View pointerEvents="none">
@@ -254,7 +306,17 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0.5,
         borderColor: '#70757A',
 
-    }
+    },
+    mapStyle: {
+        justifyContent: 'center',
+        alignSelf: 'flex-end',
+        width: '100%',
+        height: '90%',
+        backgroundColor: 'rgba(255,255,255,0.4)',
+    },
+    mapButton: {
+        height: 20
+    },
 
 
 });

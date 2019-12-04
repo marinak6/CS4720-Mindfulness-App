@@ -94,6 +94,7 @@ class JournalScreen extends React.Component {
                 // need to push this to firebase and render map
             }
             else {
+                console.log(loc.location)
                 this.setState({
                     location: loc.location,
                     mapRegion: {
