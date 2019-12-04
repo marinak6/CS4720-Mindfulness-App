@@ -169,7 +169,7 @@ class JournalScreen extends React.Component {
     onFocusFunction = () => {
         v = undefined;
         console.log(this.props.navigation.state.params)
-        if (this.props.navigation.state.params.text==="") { //when creating a new entry for a empty date in the calendar
+        if (this.props.navigation.state.params.text==="" ||this.props.navigation.state.params === undefined) { //when creating a new entry for a empty date in the calendar
             console.log('in this first condioton')
             uid = Firebase.auth().currentUser.uid;
             entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.props.navigation.state.params.date)
@@ -566,7 +566,6 @@ class JournalScreen extends React.Component {
         }
 
         this.setState({
-            value: JSON.parse(v),
             mood: mood,
             sadColor: sadColor,
             neutralColor: neutralColor,

@@ -52,11 +52,14 @@ class CalendarScreen extends React.Component {
             this.onFocusFunction()
         })
     }
+    
 
     onFocusFunction = () => {
+        console.log('onfoucs called')
         setTimeout(this.getFirebase, 500)
     }
     getFirebase = () => {
+        console.log('getting from firebase')
         uid = Firebase.auth().currentUser.uid;
         datesRef = Firebase.firestore().collection('users').doc("" + uid).collection('dates')
         let datesObj = {}
@@ -118,7 +121,7 @@ class CalendarScreen extends React.Component {
                     <View style={styles.itemTop}>
                         {console.log(item.mood)}
                         <TouchableOpacity>
-                            <MaterialCommunityIcons name={item.mood} color="#cbbade" size={55} />
+                            <MaterialCommunityIcons name={item.mood} color="#cbbade" size={30} />
                         </TouchableOpacity>
                         <Text>{item.date}</Text>
                         <TouchableOpacity onPress={() => this.getEntry(this.state.selected)}>
