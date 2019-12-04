@@ -21,7 +21,9 @@ class CalendarScreen extends React.Component {
             , title: { fontSize: 20 }, ol: { fontSize: 16 }, ul: { fontSize: 16 }, bold: { fontSize: 16, fontWeight: 'bold', color: 'black' }
         };
         this.state = {
-            selected: moment().format('YYYY-MM-DD') //initially selected date should be today
+            selected: moment().format('YYYY-MM-DD'), //initially selected date should be today
+            currentEntryMoodColor: '#cbbade'
+
         }
         this.getEntry.bind(this)
     }
@@ -59,11 +61,9 @@ class CalendarScreen extends React.Component {
     
 
     onFocusFunction = () => {
-        console.log('onfoucs called')
         setTimeout(this.getFirebase, 500)
     }
     getFirebase = () => {
-        console.log('getting from firebase')
         uid = Firebase.auth().currentUser.uid;
         datesRef = Firebase.firestore().collection('users').doc("" + uid).collection('dates')
         let datesObj = {}
@@ -116,19 +116,31 @@ class CalendarScreen extends React.Component {
     };
 
     onUpdateSelectedDate = date => {
+        //console.log(date)
         this.setState({
             selected: date.dateString
         });
     };
 
+
     renderItemForAgenda = item => {
+        console.log('items in agenda being rerendered')
         if (item.date === this.state.selected) {
+            let color = '#cbbade'
+            if(item.mood==='emoticon-sad'){
+                color = '#bacdde'
+            }
+            if(item.mood==='emoticon-neutral'){
+                color = '#decbba'
+            }
+            if(item.mood==='emoticon-happy'){
+                color = '#BBDEBA'
+            }
+            
             return (
                 <View style={styles.item}>
                     <View style={styles.itemTop}>
-                        <TouchableOpacity>
-                            <MaterialCommunityIcons name={item.mood} color="#cbbade" size={30} />
-                        </TouchableOpacity>
+                        <MaterialCommunityIcons name={item.mood} color={color} size={30} />
                         <Text>{item.date}</Text>
                         <TouchableOpacity onPress={() => this.getEntry(this.state.selected)}>
                             <MaterialCommunityIcons name='square-edit-outline' color="#cbbade" size={30} />
@@ -161,9 +173,10 @@ class CalendarScreen extends React.Component {
                     )}
                     selected={this.state.selected}
                     items={this.state.olderEntries}
-                    renderItem={this.renderItemForAgenda}
+                    renderItem={(item)=>this.renderItemForAgenda(item)}
                     renderDay={(day, item) => { return (<View />); }}
-                    onDayPress={this.onUpdateSelectedDate}
+                    onDayPress={(date)=>this.onUpdateSelectedDate(date)}
+                    onDayChange={(date)=>{console.log('day has changed')}}
                     markedDates={this.getMarkedDates()}
                     renderEmptyData={() => {
                         return (
@@ -178,7 +191,9 @@ class CalendarScreen extends React.Component {
                             </View>
                         )
                     }}
-                    rowHasChanged={(r1, r2) => r1.date !== r2.date}
+                    rowHasChanged={(r1, r2) => {
+                        return r1.date == r2.date
+                    }}
                     theme={{
                         agendaDayNumColor: '#CBBADE',
                         agendaDayTextColor: '#CBBADE',
