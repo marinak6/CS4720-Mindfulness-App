@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     quoteContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20
+        padding: 35
     },
     quoteText: {
         fontSize: 30,
