@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default class WelcomeScreen extends React.Component {
@@ -11,11 +11,13 @@ export default class WelcomeScreen extends React.Component {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={() => this.props.navigation.navigate('Login')}
+            style={styles.button}
           >
             <Text style={styles.buttonText}>LOGIN</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => this.props.navigation.navigate('Signup')}
+            style={styles.button}
           >
             <Text style={styles.buttonText}>SIGN UP</Text>
           </TouchableOpacity>
@@ -44,10 +46,21 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: 'KohinoorBangla-Semibold',
+    color: '#fff',
     fontSize: 30
   },
   buttonContainer: {
     alignItems: 'center', // center buttons within container 
-    marginTop: 50
+    marginTop: 30
+  }, 
+  button: {
+    margin:10,
+    paddingVertical: 5,
+    alignItems: 'center',
+    backgroundColor: '#CBBADE',
+    borderColor: '#CBBADE',
+    borderWidth: 1,
+    borderRadius: 5,
+    width: 200
   }
 })
