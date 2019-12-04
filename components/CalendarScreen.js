@@ -1,13 +1,14 @@
 import React from 'react'
 import Firebase from '../Firebase'
-import { View, Text, StyleSheet, Button, Dimensions } from 'react-native';
+import {Modal, View, Text, StyleSheet, Button, Dimensions } from 'react-native';
 import Constants from "expo-constants";
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { EvilIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import moment from "moment";
 import { thisExpression } from '@babel/types';
 import CNRichTextEditor, { getDefaultStyles, convertToObject, getInitialObject } from "react-native-cn-richtext-editor";
+import MapView, { Marker } from 'react-native-maps';
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,7 +22,9 @@ class CalendarScreen extends React.Component {
             , title: { fontSize: 20 }, ol: { fontSize: 16 }, ul: { fontSize: 16 }, bold: { fontSize: 16, fontWeight: 'bold', color: 'black' }
         };
         this.state = {
-            selected: moment().format('YYYY-MM-DD') //initially selected date should be today
+            selected: moment().format('YYYY-MM-DD'), //initially selected date should be today
+            currentEntryMoodColor: '#cbbade'
+
         }
         this.getEntry.bind(this)
     }
@@ -59,11 +62,9 @@ class CalendarScreen extends React.Component {
     
 
     onFocusFunction = () => {
-        console.log('onfoucs called')
         setTimeout(this.getFirebase, 500)
     }
     getFirebase = () => {
-        console.log('getting from firebase')
         uid = Firebase.auth().currentUser.uid;
         datesRef = Firebase.firestore().collection('users').doc("" + uid).collection('dates')
         let datesObj = {}
@@ -72,7 +73,9 @@ class CalendarScreen extends React.Component {
                 datesObj["" + doc.id] = [{
                     date: doc.data().date,
                     text: doc.data().text,
-                    mood: doc.data().mood
+                    mood: doc.data().mood,
+                    latitude: doc.data().latitude,
+                    longitude: doc.data().longitude
                 }]
             });
             this.setState({
@@ -109,30 +112,91 @@ class CalendarScreen extends React.Component {
             });
         }
 
-
-
         return markedDates
 
     };
 
     onUpdateSelectedDate = date => {
+        //console.log(date)
         this.setState({
             selected: date.dateString
         });
     };
 
+    openMap = () =>{
+        this.setState({ mapVisible: true })
+    }
+
+
     renderItemForAgenda = item => {
+        console.log('items in agenda being rerendered')
         if (item.date === this.state.selected) {
+            let color = '#cbbade'
+            if(item.mood==='emoticon-sad'){
+                color = '#bacdde'
+            }
+            if(item.mood==='emoticon-neutral'){
+                color = '#decbba'
+            }
+            if(item.mood==='emoticon-happy'){
+                color = '#BBDEBA'
+            }
+            
             return (
                 <View style={styles.item}>
                     <View style={styles.itemTop}>
-                        <TouchableOpacity>
-                            <MaterialCommunityIcons name={item.mood} color="#cbbade" size={30} />
-                        </TouchableOpacity>
+                        <MaterialCommunityIcons name={item.mood} color={color} size={30} />
                         <Text>{item.date}</Text>
-                        <TouchableOpacity onPress={() => this.getEntry(this.state.selected)}>
-                            <MaterialCommunityIcons name='square-edit-outline' color="#cbbade" size={30} />
-                        </TouchableOpacity>
+                        <View style={{flexDirection: 'row'}}>
+                            {item.latitude?
+                            <View>
+                                <TouchableOpacity style={{marginRight:5}} onPress={() => this.openMap()} >
+                                    <EvilIcons name="location" color="#cbbade" size={30} />
+                                </TouchableOpacity>
+                                <View>
+                                    <Modal
+                                        visible={this.state.mapVisible}
+                                        animationType={'slide'}
+                                        onRequestClose={() => his.setState({ mapVisible: false })}
+                                    >
+                                        <View style={styles.modalContainer}>
+                                            <MapView
+                                                style={styles.mapStyle}
+                                                region= {{
+                                                    latitude: parseFloat(item.latitude),
+                                                    longitude: parseFloat(item.longitude),
+                                                    latitudeDelta: 0.0922,
+                                                    longitudeDelta: 0.0421
+                                                }}
+                                            >
+                                                <MapView.Marker
+                                                    coordinate={{
+                                                        latitude: parseFloat(item.latitude),
+                                                        longitude: parseFloat(item.longitude),
+                                                    }}
+                                                    title={"Entry Location"}
+                                                /> 
+                                            </MapView>
+                                            <Button
+                                                onPress={() => this.setState({ mapVisible: false })}
+                                                title="Close Map"
+                                                style={styles.mapButton}
+                                                color="#3e3e3e"
+                                            >
+                                            </Button>
+                                        </View>
+                                    </Modal>
+                                </View>
+                            </View>
+                            :
+                            <View/>}
+
+                            <TouchableOpacity onPress={() => this.getEntry(this.state.selected)}>
+                                <MaterialCommunityIcons name='square-edit-outline' color="#cbbade" size={30} />
+                            </TouchableOpacity>
+
+                        </View>
+                        
 
                     </View>
                     <View pointerEvents="none">
@@ -161,9 +225,10 @@ class CalendarScreen extends React.Component {
                     )}
                     selected={this.state.selected}
                     items={this.state.olderEntries}
-                    renderItem={this.renderItemForAgenda}
+                    renderItem={(item)=>this.renderItemForAgenda(item)}
                     renderDay={(day, item) => { return (<View />); }}
-                    onDayPress={this.onUpdateSelectedDate}
+                    onDayPress={(date)=>this.onUpdateSelectedDate(date)}
+                    onDayChange={(date)=>{console.log('day has changed')}}
                     markedDates={this.getMarkedDates()}
                     renderEmptyData={() => {
                         return (
@@ -178,7 +243,9 @@ class CalendarScreen extends React.Component {
                             </View>
                         )
                     }}
-                    rowHasChanged={(r1, r2) => r1.date !== r2.date}
+                    rowHasChanged={(r1, r2) => {
+                        return r1.date == r2.date
+                    }}
                     theme={{
                         agendaDayNumColor: '#CBBADE',
                         agendaDayTextColor: '#CBBADE',
@@ -239,7 +306,17 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0.5,
         borderColor: '#70757A',
 
-    }
+    },
+    mapStyle: {
+        justifyContent: 'center',
+        alignSelf: 'flex-end',
+        width: '100%',
+        height: '90%',
+        backgroundColor: 'rgba(255,255,255,0.4)',
+    },
+    mapButton: {
+        height: 20
+    },
 
 
 });
