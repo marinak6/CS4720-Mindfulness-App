@@ -1,7 +1,7 @@
 import React from 'react'
 import moment from "moment";
 import Firebase from '../Firebase'
-import { Modal, View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Dimensions } from 'react-native'
+import { Modal, View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Dimensions, Alert } from 'react-native'
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
@@ -45,30 +45,47 @@ class JournalScreen extends React.Component {
             mapVisible: false,
             location: "",
             mapRegion: "",
+            sadColor: '#cbbade',
+            neutralColor: '#cbbade',
+            happyColor: '#cbbade',
         };
 
         this.editor = null;
     }
     addToFirebase = () => {
-        uid = Firebase.auth().currentUser.uid;
-        entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
-        entry.get().then((e) => {
-            if (e.exists) {
-                entry.update({
-                    date: "" + this.state.date,
-                    text: JSON.stringify(this.state.value),
-                    mood: this.state.mood
-                })
-            }
-            else {
-                entry.set({
-                    date: "" + this.state.date,
-                    text: JSON.stringify(this.state.value),
-                    mood: this.state.mood
-                })
-            }
-        })
-        this.props.navigation.navigate('Calendar')
+        if(this.state.mood){
+            uid = Firebase.auth().currentUser.uid;
+            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
+            entry.get().then((e) => {
+                if (e.exists) {
+                    entry.update({
+                        date: "" + this.state.date,
+                        text: JSON.stringify(this.state.value),
+                        mood: this.state.mood
+                    })
+                }
+                else {
+                    entry.set({
+                        date: "" + this.state.date,
+                        text: JSON.stringify(this.state.value),
+                        mood: this.state.mood
+                    })
+                }
+            })
+            this.props.navigation.navigate('Calendar')
+        }
+        else{
+            Alert.alert(
+                'Mood Not Selected',
+                'Please select a mood',
+                [
+                  {text: 'OK', onPress: () => {}},
+                ],
+                { cancelable: false }
+              )
+
+        }
+        
     }
     openMap = () => {
         if (this.state.location == "") {
@@ -169,10 +186,10 @@ class JournalScreen extends React.Component {
     onFocusFunction = () => {
         v = undefined;
         console.log(this.props.navigation.state.params)
-        if (this.props.navigation.state.params.text==="" ||this.props.navigation.state.params === undefined) { //when creating a new entry for a empty date in the calendar
+        if (this.props.navigation.state.params === undefined) { //when just navigating to the journal tab
             console.log('in this first condioton')
             uid = Firebase.auth().currentUser.uid;
-            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.props.navigation.state.params.date)
+            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + moment().format('YYYY-MM-DD'))
             entry.get().then((e) => {
                 if (e.exists) {
                     v = e.data().text
@@ -185,12 +202,12 @@ class JournalScreen extends React.Component {
                     // somehow v is undefined here
                     this.setState({
                         value: JSON.parse(v),
-                        date: this.props.navigation.state.params.date
+                        date: moment().format('YYYY-MM-DD')
                     })
                 }
             })
         }
-        else if(this.props.navigation.state.params.mood &&  this.props.navigation.state.params.text===undefined){
+        else if(this.props.navigation.state.params.mood &&  this.props.navigation.state.params.text===undefined){ //when clicking on mood in homescreen and navigate to journal
             console.log('in this second condioton')
             uid = Firebase.auth().currentUser.uid;
             entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
@@ -228,7 +245,7 @@ class JournalScreen extends React.Component {
                     this.setState({
                         value: JSON.parse(v),
                         mood: this.props.navigation.state.params.mood,
-                        date: this.props.navigation.state.params.date,
+                        date: this.state.date,
                         sadColor: sadColor,
                         neutralColor: neutralColor,
                         happyColor: happyColor,
@@ -237,7 +254,7 @@ class JournalScreen extends React.Component {
             })
 
         }
-        else {
+        else { //when clicking on a edit on a entry in calendar
             console.log('in this last condioton')
             var sadColor = '#cbbade'
             var neutralColor = '#cbbade'
@@ -259,7 +276,14 @@ class JournalScreen extends React.Component {
                 happyColor = "#BBDEBA" 
             }
 
-            v = JSON.parse(this.props.navigation.state.params.text);
+
+            if(this.props.navigation.state.params.text === ""){
+                v= [getInitialObject()]
+            }
+            else{
+                v = JSON.parse(this.props.navigation.state.params.text);
+            }
+            
             this.setState({
                 value: v,
                 date: this.props.navigation.state.params.date, 
@@ -277,6 +301,7 @@ class JournalScreen extends React.Component {
         })
 
     }
+
     onStyleKeyPress = (toolType) => {
         if (toolType == 'image') {
             return;

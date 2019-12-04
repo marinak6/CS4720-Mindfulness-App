@@ -40,7 +40,8 @@ class CalendarScreen extends React.Component {
             else {
                 this.props.navigation.navigate('Journal', {
                     text: "",
-                    date: date
+                    date: date,
+                    mood: ""
                 });
             }
         })
@@ -84,15 +85,18 @@ class CalendarScreen extends React.Component {
         let markedDates = {};
         if (this.state.olderEntries !== undefined) {
             Object.keys(this.state.olderEntries).map(date => {
-                var moodColor = 'blue'
+                var moodColor = 'black'
                 if (this.state.olderEntries[date][0].mood === 'emoticon-sad'){
-                    moodColor = '#bacdde'
+                    //moodColor = '#bacdde'
+                    moodColor = 'blue'
                 }
                 if (this.state.olderEntries[date][0].mood === 'emoticon-neutral'){
-                    moodColor = '#decbba'
+                    //moodColor = '#decbba'
+                    moodColor = 'orange'
                 }  
                 if (this.state.olderEntries[date][0].mood === 'emoticon-happy'){
-                    moodColor = '#BBDEBA'
+                    //moodColor = '#BBDEBA'
+                    moodColor = '#3bff05'
                 }
                     
                 markedDates[date] = {
@@ -119,7 +123,6 @@ class CalendarScreen extends React.Component {
             return (
                 <View style={styles.item}>
                     <View style={styles.itemTop}>
-                        {console.log(item.mood)}
                         <TouchableOpacity>
                             <MaterialCommunityIcons name={item.mood} color="#cbbade" size={30} />
                         </TouchableOpacity>
