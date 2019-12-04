@@ -32,15 +32,18 @@ class CalendarScreen extends React.Component {
         entry.get().then((e) => {
             if (e.exists) {
                 text = e.data().text;
+                mood = e.data().mood;
                 this.props.navigation.navigate('Journal', {
                     text: text,
-                    date: date
+                    date: date,
+                    mood: mood,
                 });
             }
             else {
                 this.props.navigation.navigate('Journal', {
                     text: "",
-                    date: date
+                    date: date,
+                    mood: ""
                 });
             }
         })
@@ -53,11 +56,14 @@ class CalendarScreen extends React.Component {
             this.onFocusFunction()
         })
     }
+    
 
     onFocusFunction = () => {
+        console.log('onfoucs called')
         setTimeout(this.getFirebase, 500)
     }
     getFirebase = () => {
+        console.log('getting from firebase')
         uid = Firebase.auth().currentUser.uid;
         datesRef = Firebase.firestore().collection('users').doc("" + uid).collection('dates')
         let datesObj = {}
@@ -65,37 +71,44 @@ class CalendarScreen extends React.Component {
             querySnapshot.forEach(function (doc) {
                 datesObj["" + doc.id] = [{
                     date: doc.data().date,
-                    text: doc.data().text
+                    text: doc.data().text,
+                    mood: doc.data().mood
                 }]
-                console.log(doc.data().text)
             });
             this.setState({
                 olderEntries: datesObj,
-                intialItemsLoad: datesObj
             })
         })
-            .catch(function (error) {
-                console.log("Error getting documents: ", error);
-            });
+        .catch(function (error) {
+            console.log("Error getting documents: ", error);
+        });
     }
+
     getMarkedDates = () => {
         let markedDates = {};
         if (this.state.olderEntries !== undefined) {
             Object.keys(this.state.olderEntries).map(date => {
-                let moodColor = 'blue'
-                if (date.mood === 'sad')
-                    moodColor = 'red'
-                else if (date.mood === 'neutral')
-                    moodColor = 'yellow'
-                else if (date.mood === 'happy')
-                    moodColor = 'green'
-                else { moodColor = 'blue' }
+                var moodColor = 'black'
+                if (this.state.olderEntries[date][0].mood === 'emoticon-sad'){
+                    //moodColor = '#bacdde'
+                    moodColor = 'blue'
+                }
+                if (this.state.olderEntries[date][0].mood === 'emoticon-neutral'){
+                    //moodColor = '#decbba'
+                    moodColor = 'orange'
+                }  
+                if (this.state.olderEntries[date][0].mood === 'emoticon-happy'){
+                    //moodColor = '#BBDEBA'
+                    moodColor = '#3bff05'
+                }
+                    
                 markedDates[date] = {
                     marked: true,
                     dotColor: moodColor
                 };
             });
         }
+
 
 
         return markedDates
@@ -114,7 +127,7 @@ class CalendarScreen extends React.Component {
                 <View style={styles.item}>
                     <View style={styles.itemTop}>
                         <TouchableOpacity>
-                            <MaterialCommunityIcons name={item.mood} color="#cbbade" size={55} />
+                            <MaterialCommunityIcons name={item.mood} color="#cbbade" size={30} />
                         </TouchableOpacity>
                         <Text>{item.date}</Text>
                         <TouchableOpacity onPress={() => this.getEntry(this.state.selected)}>

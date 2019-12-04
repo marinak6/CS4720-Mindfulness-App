@@ -1,7 +1,7 @@
 import React from 'react'
 import moment from "moment";
 import Firebase from '../Firebase'
-import { Modal, View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Dimensions } from 'react-native'
+import { Modal, View, Text, TextInput, StyleSheet, Button, Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Dimensions, Alert } from 'react-native'
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
@@ -43,28 +43,47 @@ class JournalScreen extends React.Component {
             mapVisible: false,
             location: "",
             mapRegion: "",
+            sadColor: '#cbbade',
+            neutralColor: '#cbbade',
+            happyColor: '#cbbade',
         };
 
         this.editor = null;
     }
     addToFirebase = () => {
-        uid = Firebase.auth().currentUser.uid;
-        entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
-        entry.get().then((e) => {
-            if (e.exists) {
-                entry.update({
-                    date: "" + this.state.date,
-                    text: JSON.stringify(this.state.value),
-                })
-            }
-            else {
-                entry.set({
-                    date: "" + this.state.date,
-                    text: JSON.stringify(this.state.value),
-                })
-            }
-        })
-        this.props.navigation.navigate('Calendar')
+        if(this.state.mood){
+            uid = Firebase.auth().currentUser.uid;
+            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
+            entry.get().then((e) => {
+                if (e.exists) {
+                    entry.update({
+                        date: "" + this.state.date,
+                        text: JSON.stringify(this.state.value),
+                        mood: this.state.mood
+                    })
+                }
+                else {
+                    entry.set({
+                        date: "" + this.state.date,
+                        text: JSON.stringify(this.state.value),
+                        mood: this.state.mood
+                    })
+                }
+            })
+            this.props.navigation.navigate('Calendar')
+        }
+        else{
+            Alert.alert(
+                'Mood Not Selected',
+                'Please select a mood',
+                [
+                  {text: 'OK', onPress: () => {}},
+                ],
+                { cancelable: false }
+              )
+
+        }
+        
     }
     openMap = () => {
         if (this.state.location == "") {
@@ -102,7 +121,6 @@ class JournalScreen extends React.Component {
         entry.get().then((e) => {
             if (e.exists) {
                 lat = e.data().latitude;
-                console.log(lat)
                 long = e.data().longitude;
                 if (lat != undefined) {
                     loc = {
@@ -131,7 +149,6 @@ class JournalScreen extends React.Component {
                 errorMessage: 'Permission to access location was denied',
             });
         }
-        console.log("hi")
         let location = await Location.getCurrentPositionAsync({});
         uid = Firebase.auth().currentUser.uid;
         entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
@@ -166,35 +183,114 @@ class JournalScreen extends React.Component {
     }
     onFocusFunction = () => {
         v = undefined;
-        if (this.props.navigation.state.params == undefined) {
+        console.log(this.props.navigation.state.params)
+        if (this.props.navigation.state.params === undefined) { //when just navigating to the journal tab
+            console.log('in this first condioton')
             uid = Firebase.auth().currentUser.uid;
-            console.log(this.state.date)
-            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
+            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + moment().format('YYYY-MM-DD'))
             entry.get().then((e) => {
                 if (e.exists) {
                     v = e.data().text
                     // gets the text from firebase
-                    console.log(v)
 
                     // if there is no text in firebase
                     if (v == undefined) {
-                        console.log("hi")
                         v = [getInitialObject()];
                     }
                     // somehow v is undefined here
                     this.setState({
                         value: JSON.parse(v),
+                        date: moment().format('YYYY-MM-DD')
                     })
-                    console.log("state" + this.state.value)
                 }
             })
         }
-        else {
-            v = JSON.parse(this.props.navigation.state.params.text);
+        else if(this.props.navigation.state.params.mood &&  this.props.navigation.state.params.text===undefined){ //when clicking on mood in homescreen and navigate to journal
+            console.log('in this second condioton')
+            uid = Firebase.auth().currentUser.uid;
+            entry = Firebase.firestore().collection('users').doc("" + uid).collection('dates').doc("" + this.state.date)
+            entry.get().then((e) => {
+                if (e.exists) {
+                    v = e.data().text
+                    // gets the text from firebase
+
+                    // if there is no text in firebase
+                    if (v == undefined) {
+                        v = [getInitialObject()];
+                    }
+                    // somehow v is undefined here
+
+                    var sadColor = '#cbbade'
+                    var neutralColor = '#cbbade'
+                    var happyColor = "#cbbade"
+                    
+                    if(this.props.navigation.state.params.mood  === 'emoticon-sad'){
+                        sadColor = '#bacdde'
+                        neutralColor = '#cbbade'
+                        happyColor = "#cbbade" 
+                    }
+                    if(this.props.navigation.state.params.mood  === 'emoticon-neutral'){
+                        sadColor = '#cbbade'
+                        neutralColor = '#decbba'
+                        happyColor = "#cbbade" 
+                    }
+                    if(this.props.navigation.state.params.mood  === 'emoticon-happy'){
+                        sadColor = '#cbbade'
+                        neutralColor = '#cbbade'
+                        happyColor = "#BBDEBA" 
+                    }
+
+                    this.setState({
+                        value: JSON.parse(v),
+                        mood: this.props.navigation.state.params.mood,
+                        date: this.state.date,
+                        sadColor: sadColor,
+                        neutralColor: neutralColor,
+                        happyColor: happyColor,
+                    })
+                }
+            })
+
+        }
+        else { //when clicking on a edit on a entry in calendar
+            console.log('in this last condioton')
+            var sadColor = '#cbbade'
+            var neutralColor = '#cbbade'
+            var happyColor = "#cbbade"
+            
+            if(this.props.navigation.state.params.mood  === 'emoticon-sad'){
+                sadColor = '#bacdde'
+                neutralColor = '#cbbade'
+                happyColor = "#cbbade" 
+            }
+            if(this.props.navigation.state.params.mood  === 'emoticon-neutral'){
+                sadColor = '#cbbade'
+                neutralColor = '#decbba'
+                happyColor = "#cbbade" 
+            }
+            if(this.props.navigation.state.params.mood  === 'emoticon-happy'){
+                sadColor = '#cbbade'
+                neutralColor = '#cbbade'
+                happyColor = "#BBDEBA" 
+            }
+
+
+            if(this.props.navigation.state.params.text === ""){
+                v= [getInitialObject()]
+            }
+            else{
+                v = JSON.parse(this.props.navigation.state.params.text);
+            }
+            
             this.setState({
                 value: v,
-                date: this.props.navigation.state.params.date
+                date: this.props.navigation.state.params.date, 
+                mood: this.props.navigation.state.params.mood,
+                sadColor: sadColor,
+                neutralColor: neutralColor,
+                happyColor: happyColor,
             })
+
         }
     }
     componentDidMount() {
@@ -203,6 +299,7 @@ class JournalScreen extends React.Component {
         })
 
     }
+
     onStyleKeyPress = (toolType) => {
         if (toolType == 'image') {
             return;
@@ -470,6 +567,36 @@ class JournalScreen extends React.Component {
         );
     }
 
+    setMood = (mood)=>{
+        let sadColor = '#cbbade'
+        let neutralColor = '#cbbade'
+        let happyColor = "#cbbade"
+        
+        if(mood  === 'emoticon-sad'){
+            sadColor = '#bacdde'
+            neutralColor = '#cbbade'
+            happyColor = "#cbbade" 
+        }
+        if(mood  === 'emoticon-neutral'){
+            sadColor = '#cbbade'
+            neutralColor = '#decbba'
+            happyColor = "#cbbade" 
+        }
+        if(mood  === 'emoticon-happy'){
+            sadColor = '#cbbade'
+            neutralColor = '#cbbade'
+            happyColor = "#BBDEBA" 
+        }
+
+        this.setState({
+            mood: mood,
+            sadColor: sadColor,
+            neutralColor: neutralColor,
+            happyColor: happyColor,
+        })
+
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -483,14 +610,15 @@ class JournalScreen extends React.Component {
                         <Text style={styles.date}>{this.state.date}</Text>
                     </View>
                     <View style={styles.moodIcons}>
-                        <TouchableOpacity style={{ marginRight: 10 }}>
-                            <MaterialCommunityIcons name="emoticon-sad" color="#cbbade" size={35} />
+                    
+                        <TouchableOpacity  onPress= {()=>this.setMood('emoticon-sad')} style={{ marginRight: 10 }}>
+                            <MaterialCommunityIcons name="emoticon-sad" color={this.state.sadColor} size={35} />
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ marginRight: 10 }}>
-                            <MaterialCommunityIcons name="emoticon-neutral" color="#cbbade" size={35} />
+                        <TouchableOpacity onPress= {()=>this.setMood('emoticon-neutral')} style={{ marginRight: 10 }}>
+                            <MaterialCommunityIcons name="emoticon-neutral" color={this.state.neutralColor} size={35} />
                         </TouchableOpacity>
-                        <TouchableOpacity>
-                            <MaterialCommunityIcons name="emoticon-happy" color="#cbbade" size={35} />
+                        <TouchableOpacity onPress= {()=>this.setMood('emoticon-happy')}>
+                            <MaterialCommunityIcons name="emoticon-happy" color={this.state.happyColor} size={35} />
                         </TouchableOpacity>
                         {(this.state.keyboardOpen == true) ? <Button onPress={Keyboard.dismiss} title="Done" color="#cbbade" /> : <View />}
                     </View>
